@@ -47,6 +47,17 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
           isCollapsed ? "md:w-20" : "md:w-64"
         } ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
       >
+        <button 
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={`hidden md:flex absolute -right-3 top-6 w-6 h-6 bg-white border border-slate-200 rounded-full items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors shadow-sm z-50`}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="w-4 h-4" />
+          ) : (
+            <ChevronLeft className="w-4 h-4" />
+          )}
+        </button>
+
         <div className={`h-16 flex items-center border-b border-slate-200 transition-all duration-300 px-6 ${isCollapsed ? "md:justify-center md:px-0" : ""}`}>
           <Building2 className={`text-blue-600 shrink-0 w-6 h-6 mr-3 ${isCollapsed ? "md:w-7 md:h-7 md:mr-0" : ""}`} />
           <span className={`font-bold text-lg tracking-tight text-slate-800 truncate ${isCollapsed ? "md:hidden" : ""}`}>
@@ -81,12 +92,12 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
           })}
         </nav>
 
-        <div className="p-3 border-t border-slate-200 space-y-2">
+        <div className="p-3 border-t border-slate-200">
           <form action={logoutAction}>
             <button 
               title={isCollapsed ? "Log out" : undefined}
               className={`flex items-center w-full text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors group ${
-                isCollapsed ? "md:justify-center md:p-3 px-3 py-2.5" : "px-3 py-2.5"
+                isCollapsed ? "md:justify-center md:p-3 px-3 py-2.5" : "px-3 py-2.5 justify-start"
               }`}
             >
               <LogOut className={`shrink-0 text-red-400 group-hover:scale-105 transition-transform ${
@@ -95,22 +106,6 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
               <span className={`font-medium whitespace-nowrap ${isCollapsed ? "md:hidden" : ""}`}>Log out</span>
             </button>
           </form>
-
-          <button 
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`hidden md:flex items-center w-full text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors ${
-              isCollapsed ? "justify-center p-3" : "px-3 py-2.5"
-            }`}
-          >
-            {isCollapsed ? (
-              <ChevronRight className="w-6 h-6 shrink-0" />
-            ) : (
-              <>
-                <ChevronLeft className="w-5 h-5 mr-3 shrink-0" />
-                <span className="font-medium whitespace-nowrap">Collapse</span>
-              </>
-            )}
-          </button>
         </div>
       </aside>
     </>
