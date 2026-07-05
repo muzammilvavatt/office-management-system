@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
-export async function createTaskAction(formData: FormData) {
+export async function createTaskAction(prevState: any, formData: FormData) {
   const name = formData.get("name") as string;
   const category = formData.get("category") as string;
   const priority = formData.get("priority") as string;
