@@ -3,8 +3,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Users, Plus, UserCircle, CheckCircle2, XCircle, Trash2 } from "lucide-react";
 import { toggleEmployeeStatus, deleteEmployeeAction } from "@/actions/employee.actions";
+import { getSession } from "@/lib/session";
 
 export default async function EmployeesPage() {
+  const session = await getSession();
+  const isAdmin = session?.user?.role === "ADMIN";
+
   const employees = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
   });
@@ -16,12 +20,14 @@ export default async function EmployeesPage() {
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Employees</h2>
           <p className="text-slate-500">Manage your team members and their roles.</p>
         </div>
-        <Link href="/dashboard/employees/add">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Employee
-          </Button>
-        </Link>
+        {isAdmin && (
+          <Link href="/dashboard/employees/add">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Employee
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden">
@@ -33,7 +39,7 @@ export default async function EmployeesPage() {
                 <th scope="col" className="px-6 py-4 font-semibold">Role</th>
                 <th scope="col" className="px-6 py-4 font-semibold">Status</th>
                 <th scope="col" className="px-6 py-4 font-semibold">Joined</th>
-                <th scope="col" className="px-6 py-4 text-right font-semibold">Actions</th>
+                {isAdmin && <th scope="col" className="px-6 py-4 text-right font-semibold">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -67,39 +73,41 @@ export default async function EmployeesPage() {
                   <td className="px-6 py-4 text-slate-500">
                     {new Date(employee.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end items-center space-x-2">
-                      <form action={toggleEmployeeStatus.bind(null, employee.id, employee.isActive)}>
-                        <Button 
-                          type="submit" 
-                          variant="ghost" 
-                          size="sm"
-                          className={employee.isActive 
-                            ? "text-amber-600 hover:text-amber-700 hover:bg-amber-50" 
-                            : "text-green-600 hover:text-green-700 hover:bg-green-50"
-                          }
-                        >
-                          {employee.isActive ? "Deactivate" : "Activate"}
-                        </Button>
-                      </form>
-                      <form action={deleteEmployeeAction.bind(null, employee.id)}>
-                        <Button 
-                          type="submit" 
-                          variant="ghost" 
-                          size="sm"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          title="Delete Employee"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </form>
-                    </div>
-                  </td>
+                  {isAdmin && (
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end items-center space-x-2">
+                        <form action={toggleEmployeeStatus.bind(null, employee.id, employee.isActive)}>
+                          <Button 
+                            type="submit" 
+                            variant="ghost" 
+                            size="sm"
+                            className={employee.isActive 
+                              ? "text-amber-600 hover:text-amber-700 hover:bg-amber-50" 
+                              : "text-green-600 hover:text-green-700 hover:bg-green-50"
+                            }
+                          >
+                            {employee.isActive ? "Deactivate" : "Activate"}
+                          </Button>
+                        </form>
+                        <form action={deleteEmployeeAction.bind(null, employee.id)}>
+                          <Button 
+                            type="submit" 
+                            variant="ghost" 
+                            size="sm"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            title="Delete Employee"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </form>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
               {employees.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={isAdmin ? 5 : 4} className="px-6 py-12 text-center text-slate-500">
                     No employees found. Add your first team member!
                   </td>
                 </tr>

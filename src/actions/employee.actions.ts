@@ -4,8 +4,22 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getSession } from "@/lib/session";
+
+async function requireAdmin() {
+  const session = await getSession();
+  if (!session || session.user?.role !== "ADMIN") {
+    throw new Error("Unauthorized: Admin access required.");
+  }
+}
 
 export async function createEmployeeAction(prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+  } catch (err: any) {
+    return { error: err.message };
+  }
+
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -43,6 +57,7 @@ export async function createEmployeeAction(prevState: any, formData: FormData) {
 }
 
 export async function toggleEmployeeStatus(id: string, currentStatus: boolean) {
+  await requireAdmin();
   await prisma.user.update({
     where: { id },
     data: { isActive: !currentStatus },
@@ -51,6 +66,7 @@ export async function toggleEmployeeStatus(id: string, currentStatus: boolean) {
 }
 
 export async function deleteEmployeeAction(id: string) {
+  await requireAdmin();
   // Disconnect or delete related data as needed
   // Note: in a real system we might re-assign tasks before deletion,
   // but for now, we rely on prisma cascading or manual cleanup if needed.

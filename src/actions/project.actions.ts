@@ -3,6 +3,14 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getSession } from "@/lib/session";
+
+async function requireAdmin() {
+  const session = await getSession();
+  if (!session || session.user?.role !== "ADMIN") {
+    throw new Error("Unauthorized: Admin access required.");
+  }
+}
 
 export async function createProjectAction(prevState: any, formData: FormData) {
   const name = formData.get("name") as string;
@@ -59,6 +67,7 @@ export async function updateProjectStatusAction(id: string, newStatus: string) {
 }
 
 export async function deleteProjectAction(id: string) {
+  await requireAdmin();
   await prisma.project.delete({
     where: { id },
   });
