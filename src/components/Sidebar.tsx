@@ -85,23 +85,30 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
           <form action={logoutAction}>
             <button 
               title={isCollapsed ? "Log out" : undefined}
-              className={`flex items-center w-full text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors group px-3 py-2.5 ${
-                isCollapsed ? "md:justify-center md:py-3" : ""
+              className={`flex items-center w-full text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors group ${
+                isCollapsed ? "md:justify-center md:p-3 px-3 py-2.5" : "px-3 py-2.5"
               }`}
             >
-              <LogOut className={`shrink-0 w-5 h-5 mr-3 ${isCollapsed ? "md:w-6 md:h-6 md:mr-0" : ""} text-red-400 group-hover:scale-105 transition-transform`} />
+              <LogOut className={`shrink-0 text-red-400 group-hover:scale-105 transition-transform ${
+                isCollapsed ? "md:w-6 md:h-6 md:mr-0 w-5 h-5 mr-3" : "w-5 h-5 mr-3"
+              }`} />
               <span className={`font-medium whitespace-nowrap ${isCollapsed ? "md:hidden" : ""}`}>Log out</span>
             </button>
           </form>
 
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`hidden md:flex items-center justify-center w-full text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors py-3`}
+            className={`hidden md:flex items-center w-full text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-lg transition-colors ${
+              isCollapsed ? "justify-center p-3" : "px-3 py-2.5"
+            }`}
           >
             {isCollapsed ? (
-              <ChevronRight className="w-5 h-5 shrink-0" />
+              <ChevronRight className="w-6 h-6 shrink-0" />
             ) : (
-              <ChevronLeft className="w-5 h-5 shrink-0" />
+              <>
+                <ChevronLeft className="w-5 h-5 mr-3 shrink-0" />
+                <span className="font-medium whitespace-nowrap">Collapse</span>
+              </>
             )}
           </button>
         </div>
