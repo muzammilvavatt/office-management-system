@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, MoreHorizontal } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+import { deleteProjectAction } from "@/actions/project.actions";
 
 export default async function ProjectsPage() {
   const projects = await prisma.project.findMany({
@@ -75,11 +76,24 @@ export default async function ProjectsPage() {
                     {project.deadline ? new Date(project.deadline).toLocaleDateString() : "—"}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Link href={`/dashboard/projects/${project.id}`}>
-                      <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-                        View
-                      </Button>
-                    </Link>
+                    <div className="flex justify-end items-center space-x-2">
+                      <Link href={`/dashboard/projects/${project.id}`}>
+                        <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                          View
+                        </Button>
+                      </Link>
+                      <form action={deleteProjectAction.bind(null, project.id)}>
+                        <Button 
+                          type="submit" 
+                          variant="ghost" 
+                          size="sm"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          title="Delete Project"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </form>
+                    </div>
                   </td>
                 </tr>
               ))}

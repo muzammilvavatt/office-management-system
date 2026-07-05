@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Users, Plus, UserCircle, CheckCircle2, XCircle } from "lucide-react";
-import { toggleEmployeeStatus } from "@/actions/employee.actions";
+import { Users, Plus, UserCircle, CheckCircle2, XCircle, Trash2 } from "lucide-react";
+import { toggleEmployeeStatus, deleteEmployeeAction } from "@/actions/employee.actions";
 
 export default async function EmployeesPage() {
   const employees = await prisma.user.findMany({
@@ -68,19 +68,32 @@ export default async function EmployeesPage() {
                     {new Date(employee.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <form action={toggleEmployeeStatus.bind(null, employee.id, employee.isActive)}>
-                      <Button 
-                        type="submit" 
-                        variant="ghost" 
-                        size="sm"
-                        className={employee.isActive 
-                          ? "text-red-600 hover:text-red-700 hover:bg-red-50" 
-                          : "text-green-600 hover:text-green-700 hover:bg-green-50"
-                        }
-                      >
-                        {employee.isActive ? "Deactivate" : "Activate"}
-                      </Button>
-                    </form>
+                    <div className="flex justify-end items-center space-x-2">
+                      <form action={toggleEmployeeStatus.bind(null, employee.id, employee.isActive)}>
+                        <Button 
+                          type="submit" 
+                          variant="ghost" 
+                          size="sm"
+                          className={employee.isActive 
+                            ? "text-amber-600 hover:text-amber-700 hover:bg-amber-50" 
+                            : "text-green-600 hover:text-green-700 hover:bg-green-50"
+                          }
+                        >
+                          {employee.isActive ? "Deactivate" : "Activate"}
+                        </Button>
+                      </form>
+                      <form action={deleteEmployeeAction.bind(null, employee.id)}>
+                        <Button 
+                          type="submit" 
+                          variant="ghost" 
+                          size="sm"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          title="Delete Employee"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </form>
+                    </div>
                   </td>
                 </tr>
               ))}

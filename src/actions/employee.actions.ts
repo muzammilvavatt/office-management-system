@@ -49,3 +49,14 @@ export async function toggleEmployeeStatus(id: string, currentStatus: boolean) {
   });
   revalidatePath("/dashboard/employees");
 }
+
+export async function deleteEmployeeAction(id: string) {
+  // Disconnect or delete related data as needed
+  // Note: in a real system we might re-assign tasks before deletion,
+  // but for now, we rely on prisma cascading or manual cleanup if needed.
+  // We'll just delete the user. Prisma schema uses cascade on TaskAssignee.
+  await prisma.user.delete({
+    where: { id },
+  });
+  revalidatePath("/dashboard/employees");
+}
