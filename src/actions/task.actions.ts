@@ -53,8 +53,11 @@ export async function createTaskAction(prevState: any, formData: FormData) {
 
 export async function updateTaskStatusAction(id: string, formData: FormData) {
   const status = formData.get("status") as string;
-  const progressStr = formData.get("progress") as string;
-  const progress = parseInt(progressStr, 10) || 0;
+  
+  let progress = 0;
+  if (status === "COMPLETED") progress = 100;
+  if (status === "IN_PROGRESS") progress = 50;
+  if (status === "PENDING") progress = 0;
   
   await prisma.task.update({
     where: { id },

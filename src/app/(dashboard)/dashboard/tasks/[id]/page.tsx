@@ -95,22 +95,10 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
                     defaultValue={task.status}
                     className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 text-slate-900"
                   >
-                    <option value="PENDING">Pending</option>
-                    <option value="IN_PROGRESS">In Progress</option>
-                    <option value="REVIEW">Under Review</option>
-                    <option value="COMPLETED">Completed</option>
+                    <option value="PENDING">Pending (0%)</option>
+                    <option value="IN_PROGRESS">In Progress (50%)</option>
+                    <option value="COMPLETED">Completed (100%)</option>
                   </select>
-                </div>
-                <div className="w-32 space-y-2">
-                  <label className="text-xs text-slate-500 uppercase font-semibold">Progress (%)</label>
-                  <input
-                    type="number"
-                    name="progress"
-                    defaultValue={task.progress}
-                    min="0"
-                    max="100"
-                    className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 text-slate-900"
-                  />
                 </div>
                 <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-10">
                   Save Update
