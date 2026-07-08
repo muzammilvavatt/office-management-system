@@ -19,6 +19,7 @@ export default async function TasksPage() {
     orderBy: { createdAt: "desc" },
     include: {
       project: true,
+      dependsOn: true,
       assignees: {
         include: { user: true }
       }

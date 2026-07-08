@@ -16,6 +16,11 @@ export default async function AddTaskPage() {
     orderBy: { name: "asc" }
   });
 
+  const tasks = await prisma.task.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { project: true }
+  });
+
   return (
     <div className="space-y-6 max-w-3xl mx-auto pb-10">
       <div className="flex items-center space-x-4">
@@ -40,7 +45,7 @@ export default async function AddTaskPage() {
             Define the scope, priority, and who is responsible.
           </CardDescription>
         </CardHeader>
-        <AddTaskForm projects={projects} employees={employees} />
+        <AddTaskForm projects={projects} employees={employees} tasks={tasks} />
       </Card>
     </div>
   );

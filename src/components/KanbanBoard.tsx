@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import Link from "next/link";
 import { updateTaskStatusDragAction } from "@/actions/task.actions";
-import { Clock } from "lucide-react";
+import { Clock, Lock } from "lucide-react";
 
 type Assignee = {
   user: {
@@ -23,6 +23,11 @@ type Task = {
   project: {
     name: string;
   };
+  dependsOn?: {
+    id: string;
+    status: string;
+    name: string;
+  } | null;
   assignees: Assignee[];
 };
 
@@ -94,19 +99,23 @@ export function KanbanBoard({ initialTasks }: { initialTasks: Task[] }) {
                       snapshot.isDraggingOver ? "bg-slate-50 border-blue-200 border-dashed" : `${column.bgColor} border-transparent`
                     } transition-colors duration-200 flex flex-col gap-3 min-h-[150px]`}
                   >
-                    {columnTasks.map((task, index) => (
-                      <Draggable key={task.id} draggableId={task.id} index={index}>
+                    {columnTasks.map((task, index) => {
+                      const isBlocked = task.dependsOn && task.dependsOn.status !== "COMPLETED";
+
+                      return (
+                      <Draggable key={task.id} draggableId={task.id} index={index} isDragDisabled={!!isBlocked}>
                         {(provided, snapshot) => (
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className={`bg-white p-4 rounded-lg shadow-sm border border-slate-200 group relative ${
-                              snapshot.isDragging ? "shadow-md ring-2 ring-blue-500/20 rotate-1 z-50" : "hover:border-blue-300"
+                            className={`${isBlocked ? "bg-slate-50 opacity-60" : "bg-white"} p-4 rounded-lg shadow-sm border border-slate-200 group relative ${
+                              snapshot.isDragging ? "shadow-md ring-2 ring-blue-500/20 rotate-1 z-50" : (isBlocked ? "" : "hover:border-blue-300")
                             } transition-all duration-200`}
                           >
                             <div className="flex justify-between items-start mb-2">
-                              <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider">
+                              <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider flex items-center">
+                                {isBlocked && <Lock className="w-3 h-3 mr-1" />}
                                 {task.category.replace(/_/g, " ")}
                               </span>
                               {task.priority === "HIGH" && (
@@ -123,6 +132,11 @@ export function KanbanBoard({ initialTasks }: { initialTasks: Task[] }) {
                               <p className="text-xs text-slate-500 mb-4 line-clamp-1">
                                 {task.project.name}
                               </p>
+                              {isBlocked && (
+                                <p className="text-[10px] font-semibold text-amber-600 mb-2 bg-amber-50 px-2 py-1 rounded inline-block">
+                                  Waiting on: {task.dependsOn!.name}
+                                </p>
+                              )}
                             </Link>
 
                             <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
@@ -151,7 +165,7 @@ export function KanbanBoard({ initialTasks }: { initialTasks: Task[] }) {
                           </div>
                         )}
                       </Draggable>
-                    ))}
+                    )})}
                     {provided.placeholder}
                   </div>
                 )}

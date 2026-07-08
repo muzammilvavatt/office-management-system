@@ -13,6 +13,7 @@ export async function createTaskAction(prevState: any, formData: FormData) {
   const notes = formData.get("notes") as string;
   const projectId = formData.get("projectId") as string;
   const assigneeId = formData.get("assigneeId") as string;
+  const dependsOnId = formData.get("dependsOnId") as string;
 
   if (!name || !category || !projectId || !assigneeId) {
     return { error: "Name, Category, Project, and Assignee are required." };
@@ -34,6 +35,7 @@ export async function createTaskAction(prevState: any, formData: FormData) {
         deadline,
         notes: notes || null,
         projectId,
+        dependsOnId: dependsOnId || null,
       },
     });
 
@@ -92,6 +94,26 @@ export async function updateTaskStatusAction(id: string, formData: FormData) {
       }
     });
   }
+
+  // Check if we unblocked any downstream tasks
+  if (status === "COMPLETED") {
+    const unblockedTasks = await prisma.task.findMany({
+      where: { dependsOnId: id, status: { not: "COMPLETED" } },
+      include: { assignees: true }
+    });
+
+    for (const ut of unblockedTasks) {
+      for (const a of ut.assignees) {
+        await prisma.notification.create({
+          data: {
+            userId: a.userId,
+            type: "TASK_UNLOCKED",
+            message: `Task completed! You can now start working on: ${ut.name}`,
+          }
+        });
+      }
+    }
+  }
   
   revalidatePath("/dashboard/tasks");
   revalidatePath("/dashboard");
@@ -121,6 +143,26 @@ export async function updateTaskStatusDragAction(id: string, status: string) {
         details: `Moved to ${status.replace(/_/g, " ")}`
       }
     });
+  }
+
+  // Check if we unblocked any downstream tasks
+  if (status === "COMPLETED") {
+    const unblockedTasks = await prisma.task.findMany({
+      where: { dependsOnId: id, status: { not: "COMPLETED" } },
+      include: { assignees: true }
+    });
+
+    for (const ut of unblockedTasks) {
+      for (const a of ut.assignees) {
+        await prisma.notification.create({
+          data: {
+            userId: a.userId,
+            type: "TASK_UNLOCKED",
+            message: `Task completed! You can now start working on: ${ut.name}`,
+          }
+        });
+      }
+    }
   }
   
   revalidatePath("/dashboard/tasks");

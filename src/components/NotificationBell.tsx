@@ -1,0 +1,55 @@
+import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/session";
+import { Bell } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+
+export async function NotificationBell() {
+  const session = await getSession();
+  
+  if (!session?.user?.id) return null;
+
+  const notifications = await prisma.notification.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: "desc" },
+    take: 5
+  });
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative hover:bg-slate-100 text-slate-600 rounded-full h-8 w-8">
+          <Bell className="w-4 h-4" />
+          {unreadCount > 0 && (
+            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0 mr-4 mt-2 bg-white rounded-xl shadow-lg border border-slate-200 z-50">
+        <div className="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl">
+          <h3 className="font-bold text-slate-800">Notifications</h3>
+        </div>
+        <div className="max-h-80 overflow-y-auto">
+          {notifications.length === 0 ? (
+            <div className="p-6 text-center text-sm text-slate-500">
+              No new notifications.
+            </div>
+          ) : (
+            <div className="flex flex-col divide-y divide-slate-100">
+              {notifications.map(n => (
+                <div key={n.id} className={`p-4 hover:bg-slate-50 transition-colors ${!n.isRead ? 'bg-blue-50/50' : ''}`}>
+                  <p className="text-sm text-slate-800 font-medium leading-snug">{n.message}</p>
+                  <span className="text-xs text-slate-400 mt-2 block">
+                    {new Date(n.createdAt).toLocaleDateString()} at {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}

@@ -20,7 +20,7 @@ const TASK_CATEGORIES = [
   "OTHER"
 ];
 
-export function AddTaskForm({ projects, employees }: { projects: any[], employees: any[] }) {
+export function AddTaskForm({ projects, employees, tasks = [] }: { projects: any[], employees: any[], tasks?: any[] }) {
   const [state, formAction, isPending] = useActionState(createTaskAction, undefined);
 
   return (
@@ -116,6 +116,21 @@ export function AddTaskForm({ projects, employees }: { projects: any[], employee
             />
           </div>
           
+          <div className="space-y-2">
+            <Label htmlFor="dependsOnId" className="text-slate-700 font-medium">Depends On (Optional)</Label>
+            <select
+              id="dependsOnId"
+              name="dependsOnId"
+              className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 text-slate-900"
+            >
+              <option value="">No Dependencies</option>
+              {tasks.map(t => (
+                <option key={t.id} value={t.id}>[{t.project.name}] {t.name}</option>
+              ))}
+            </select>
+            <p className="text-xs text-slate-500 mt-1">This task will remain locked until the selected task is completed.</p>
+          </div>
+
           <div className="space-y-2 col-span-1 md:col-span-2">
             <Label htmlFor="notes" className="text-slate-700 font-medium">Task Notes</Label>
             <textarea
