@@ -34,7 +34,7 @@ export async function createProjectAction(prevState: any, formData: FormData) {
   }
 
   const workflowStepsStr = formData.get("workflowSteps") as string;
-  let workflowSteps = [];
+  let workflowSteps: Array<{ name: string, category: string, assigneeId: string }> = [];
   if (workflowStepsStr) {
     try {
       workflowSteps = JSON.parse(workflowStepsStr);
@@ -60,7 +60,7 @@ export async function createProjectAction(prevState: any, formData: FormData) {
     });
 
     // Create the workflow tasks sequentially
-    let previousTaskId = null;
+    let previousTaskId: string | null = null;
     for (const step of workflowSteps) {
       const task = await prisma.task.create({
         data: {
