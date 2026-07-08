@@ -19,13 +19,11 @@ export async function NotificationBell() {
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative hover:bg-slate-100 text-slate-600 rounded-full h-8 w-8">
-          <Bell className="w-4 h-4" />
-          {unreadCount > 0 && (
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-          )}
-        </Button>
+      <PopoverTrigger className="relative inline-flex items-center justify-center rounded-full h-8 w-8 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
+        <Bell className="w-4 h-4" />
+        {unreadCount > 0 && (
+          <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+        )}
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0 mr-4 mt-2 bg-white rounded-xl shadow-lg border border-slate-200 z-50">
         <div className="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl">
