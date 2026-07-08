@@ -62,7 +62,7 @@ export async function createProjectAction(prevState: any, formData: FormData) {
     // Create the workflow tasks sequentially
     let previousTaskId: string | null = null;
     for (const step of workflowSteps) {
-      const task = await prisma.task.create({
+      const createdTask: any = await prisma.task.create({
         data: {
           name: step.name,
           category: step.category,
@@ -75,12 +75,12 @@ export async function createProjectAction(prevState: any, formData: FormData) {
       // Assign the employee
       await prisma.taskAssignee.create({
         data: {
-          taskId: task.id,
+          taskId: createdTask.id,
           userId: step.assigneeId
         }
       });
 
-      previousTaskId = task.id;
+      previousTaskId = createdTask.id;
     }
 
   } catch (error) {
