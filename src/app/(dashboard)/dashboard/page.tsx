@@ -66,8 +66,8 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       
-      {/* Attendance Tracker Widget */}
-      {session?.user?.id && (
+      {/* Attendance Tracker Widget - Hidden for Admins */}
+      {session?.user?.id && session.user.role !== "ADMIN" && (
         <div className="mb-6 max-w-sm">
           <AttendanceTracker todayRecord={todayRecord} />
         </div>
