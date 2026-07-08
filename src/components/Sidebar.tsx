@@ -21,6 +21,7 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
     { href: "/dashboard/projects", label: "Projects", icon: FolderKanban, adminOnly: true },
     { href: "/dashboard/tasks", label: isAdmin ? "All Tasks" : "My Tasks", icon: CheckSquare, adminOnly: false },
     { href: "/dashboard/employees", label: "Employees", icon: Users, adminOnly: true },
+    { href: "/dashboard/attendance", label: "Attendance", icon: CheckSquare, adminOnly: true },
     { href: "/dashboard/settings", label: "Settings", icon: Settings, adminOnly: false },
   ];
 

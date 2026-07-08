@@ -22,6 +22,7 @@ model User {
   uploadedFiles File[]
   notifications Notification[]
   activityLogs  ActivityLog[]
+  attendances   Attendance[]
 }
 
 model Project {
@@ -119,4 +120,16 @@ model ActivityLog {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt  DateTime @default(now())
+}
+
+model Attendance {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime  // Stored as Date without time
+  clockIn   DateTime
+  clockOut  DateTime?
+  status    String    @default("PRESENT") // PRESENT, HALF_DAY, LATE
+
+  createdAt DateTime  @default(now())
 }

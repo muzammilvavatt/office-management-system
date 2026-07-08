@@ -1,10 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FolderKanban, CheckSquare, Users, AlertCircle, PieChart as PieChartIcon, BarChart3 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/session";
 import { TaskDistributionChart } from "@/components/charts/TaskDistributionChart";
 import { EmployeeWorkloadChart } from "@/components/charts/EmployeeWorkloadChart";
+import { AttendanceTracker } from "@/components/AttendanceTracker";
 
 export default async function DashboardPage() {
+  const session = await getSession();
+  
   // Fetch some real stats from the database
   const employeeCount = await prisma.user.count();
   const projectCount = await prisma.project.count();
@@ -45,8 +49,30 @@ export default async function DashboardPage() {
     tasks: u._count.assignedTasks
   })).filter(u => u.tasks > 0);
 
+  // Fetch today's attendance record for the logged-in user
+  let todayRecord = null;
+  if (session?.user?.id) {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    
+    todayRecord = await prisma.attendance.findFirst({
+      where: {
+        userId: session.user.id,
+        date: { gte: todayStart },
+      }
+    });
+  }
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      
+      {/* Attendance Tracker Widget */}
+      {session?.user?.id && (
+        <div className="mb-6 max-w-sm">
+          <AttendanceTracker todayRecord={todayRecord} />
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         
         <Card className="bg-white border-slate-200 shadow-sm text-slate-900 rounded-xl">
