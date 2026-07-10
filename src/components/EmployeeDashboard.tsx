@@ -20,7 +20,7 @@ export function EmployeeDashboard({
   myProjectTasks,
   totalHoursToday 
 }: EmployeeDashboardProps) {
-  const firstName = user.name.split(' ')[0];
+  const firstName = user?.name ? user.name.split(' ')[0] : 'Employee';
   const pendingChecklistCount = dailyChecklistData.filter(t => t.status === "PENDING").length;
   
   const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
