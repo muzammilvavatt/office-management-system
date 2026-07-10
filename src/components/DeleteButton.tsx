@@ -22,20 +22,16 @@ export function DeleteButton({ itemName = "item" }: { itemName?: string }) {
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button 
-          type="button" 
-          variant="ghost" 
-          size="sm"
-          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-          title={`Delete ${itemName}`}
-          disabled={pending}
-          onClick={(e) => {
-            formRef.current = e.currentTarget.closest('form');
-          }}
-        >
-          <Trash2 className="w-4 h-4" />
-        </Button>
+      <AlertDialogTrigger 
+        type="button"
+        className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 disabled:pointer-events-none disabled:opacity-50 h-9 w-9 text-red-600 hover:text-red-700 hover:bg-red-50"
+        title={`Delete ${itemName}`}
+        disabled={pending}
+        onClick={(e) => {
+          formRef.current = e.currentTarget.closest('form');
+        }}
+      >
+        <Trash2 className="w-4 h-4" />
       </AlertDialogTrigger>
       <AlertDialogContent className="bg-white">
         <AlertDialogHeader>
