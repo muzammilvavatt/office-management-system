@@ -64,17 +64,19 @@ export function AddTaskForm({ projects, employees, tasks = [] }: { projects: any
 
           <div className="space-y-2">
             <Label htmlFor="category" className="text-slate-700 font-medium">Category *</Label>
-            <select
+            <Input
               id="category"
               name="category"
+              list="categories"
               required
-              className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 text-slate-900"
-            >
-              <option value="">Select Category...</option>
+              className="bg-white border-slate-300 focus-visible:ring-blue-500 text-slate-900"
+              placeholder="Select or type custom..."
+            />
+            <datalist id="categories">
               {TASK_CATEGORIES.map(c => (
                 <option key={c} value={c}>{c.replace(/_/g, " ")}</option>
               ))}
-            </select>
+            </datalist>
           </div>
 
           <div className="space-y-2">
