@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Users, Plus, UserCircle, CheckCircle2, XCircle, Trash2, Pencil } from "lucide-react";
 import { toggleEmployeeStatus, deleteEmployeeAction } from "@/actions/employee.actions";
 import { getSession } from "@/lib/session";
+import { DeleteButton } from "@/components/DeleteButton";
 
 export default async function EmployeesPage() {
   const session = await getSession();
@@ -100,15 +101,7 @@ export default async function EmployeesPage() {
                           </Button>
                         </Link>
                         <form action={deleteEmployeeAction.bind(null, employee.id)}>
-                          <Button 
-                            type="submit" 
-                            variant="ghost" 
-                            size="sm"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            title="Delete Employee"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          <DeleteButton itemName="Employee" />
                         </form>
                       </div>
                     </td>
