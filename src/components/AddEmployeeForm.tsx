@@ -1,29 +1,22 @@
 "use client";
 
 import { useActionState } from "react";
-import { editEmployeeAction } from "@/actions/employee.actions";
+import { createEmployeeAction } from "@/actions/employee.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, UserCog } from "lucide-react";
+import { ArrowLeft, UserPlus } from "lucide-react";
 import Link from "next/link";
 
-export function EditEmployeeForm({ 
-  employee,
+export function AddEmployeeForm({ 
   projectRoles, 
-  dailyResponsibilities,
-  assignedProjectRoles,
-  assignedDailyResponsibilities
+  dailyResponsibilities 
 }: { 
-  employee: any,
   projectRoles: any[], 
-  dailyResponsibilities: any[],
-  assignedProjectRoles: string[],
-  assignedDailyResponsibilities: string[]
+  dailyResponsibilities: any[] 
 }) {
-  const editActionWithId = editEmployeeAction.bind(null, employee.id);
-  const [state, formAction, isPending] = useActionState(editActionWithId, undefined);
+  const [state, formAction, isPending] = useActionState(createEmployeeAction, undefined);
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-10">
@@ -34,8 +27,8 @@ export function EditEmployeeForm({
           </Button>
         </Link>
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Edit Employee</h2>
-          <p className="text-slate-500">Update {employee.name}'s details.</p>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900">Add Employee</h2>
+          <p className="text-slate-500">Create a new account for your team member.</p>
         </div>
       </div>
 
@@ -44,7 +37,7 @@ export function EditEmployeeForm({
           <Card className="bg-white border-slate-200 text-slate-900 shadow-sm rounded-xl md:col-span-1">
             <CardHeader className="border-b border-slate-100 pb-4">
               <CardTitle className="flex items-center text-lg font-bold">
-                <UserCog className="w-5 h-5 mr-2 text-blue-600" />
+                <UserPlus className="w-5 h-5 mr-2 text-blue-600" />
                 Account Details
               </CardTitle>
             </CardHeader>
@@ -60,7 +53,7 @@ export function EditEmployeeForm({
                 <Input
                   id="name"
                   name="name"
-                  defaultValue={employee.name}
+                  placeholder="John Doe"
                   required
                   className="bg-white border-slate-300 focus-visible:ring-blue-500 text-slate-900"
                 />
@@ -72,19 +65,20 @@ export function EditEmployeeForm({
                   id="email"
                   name="email"
                   type="email"
-                  defaultValue={employee.email}
+                  placeholder="john@consultancy.com"
                   required
                   className="bg-white border-slate-300 focus-visible:ring-blue-500 text-slate-900"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-700 font-medium">New Password (Optional)</Label>
+                <Label htmlFor="password" className="text-slate-700 font-medium">Temporary Password</Label>
                 <Input
                   id="password"
                   name="password"
                   type="password"
-                  placeholder="Leave blank to keep current password"
+                  placeholder="••••••••"
+                  required
                   className="bg-white border-slate-300 focus-visible:ring-blue-500 text-slate-900"
                 />
               </div>
@@ -95,7 +89,6 @@ export function EditEmployeeForm({
                   id="role"
                   name="role"
                   required
-                  defaultValue={employee.role}
                   className="flex h-10 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 text-slate-900"
                 >
                   <option value="EMPLOYEE">EMPLOYEE</option>
@@ -120,7 +113,6 @@ export function EditEmployeeForm({
                         type="checkbox" 
                         name="projectRoles" 
                         value={role.id} 
-                        defaultChecked={assignedProjectRoles.includes(role.id)}
                         className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
                       />
                       <div className="flex flex-col">
@@ -147,7 +139,6 @@ export function EditEmployeeForm({
                         type="checkbox" 
                         name="dailyResponsibilities" 
                         value={task.id} 
-                        defaultChecked={assignedDailyResponsibilities.includes(task.id)}
                         className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
                       />
                       <div className="flex flex-col">
@@ -174,7 +165,7 @@ export function EditEmployeeForm({
             className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
             disabled={isPending}
           >
-            {isPending ? "Saving..." : "Save Changes"}
+            {isPending ? "Creating..." : "Create Employee"}
           </Button>
         </div>
       </form>

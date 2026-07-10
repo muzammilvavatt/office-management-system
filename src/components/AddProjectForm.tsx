@@ -1,137 +1,18 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { createProjectAction } from "@/actions/project.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CardContent, CardFooter } from "@/components/ui/card";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Building2, Plus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-const TASK_CATEGORIES = [
-  "SITE_INSPECTION",
-  "SITE_PLAN",
-  "FLOOR_PLAN",
-  "RULE_CHART",
-  "NOC_FIRE",
-  "NOC_PCB",
-  "NOC_RTP",
-  "DOCUMENTATION",
-  "OTHER"
-];
-
-type WorkflowStep = {
-  id: string;
-  name: string;
-  category: string;
-  assigneeId: string;
-};
-
-export function AddProjectForm({ employees }: { employees: any[] }) {
+export function AddProjectForm() {
   const [state, formAction, isPending] = useActionState(createProjectAction, undefined);
-  const [steps, setSteps] = useState<WorkflowStep[]>([]);
-
-  const addStep = () => {
-    setSteps([
-      ...steps,
-      { id: crypto.randomUUID(), name: "", category: "SITE_INSPECTION", assigneeId: "" }
-    ]);
-  };
-
-  const removeStep = (id: string) => {
-    setSteps(steps.filter(s => s.id !== id));
-  };
-
-  const updateStep = (id: string, field: keyof WorkflowStep, value: string) => {
-    setSteps(steps.map(s => s.id === id ? { ...s, [field]: value } : s));
-  };
-
-  const moveStep = (index: number, direction: 'up' | 'down') => {
-    if (direction === 'up' && index > 0) {
-      const newSteps = [...steps];
-      [newSteps[index - 1], newSteps[index]] = [newSteps[index], newSteps[index - 1]];
-      setSteps(newSteps);
-    } else if (direction === 'down' && index < steps.length - 1) {
-      const newSteps = [...steps];
-      [newSteps[index], newSteps[index + 1]] = [newSteps[index + 1], newSteps[index]];
-      setSteps(newSteps);
-    }
-  };
 
   return (
-    <form action={formAction}>
-      <CardContent className="space-y-8 pt-6">
-        {state?.error && (
-          <div className="p-3 text-sm text-red-700 bg-red-50 rounded-md border border-red-200">
-            {state.error}
-          </div>
-        )}
-        
-        {/* Project Details Section */}
-        <div>
-          <h3 className="text-lg font-semibold text-slate-800 border-b border-slate-100 pb-2 mb-4">1. Project Details</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2 col-span-1 md:col-span-2">
-              <Label htmlFor="name" className="text-slate-700 font-medium">Project Name *</Label>
-              <Input
-                id="name"
-                name="name"
-                placeholder="e.g. Skyline Tower Phase 1"
-                required
-                className="bg-white border-slate-300 focus-visible:ring-blue-500 text-slate-900"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="clientName" className="text-slate-700 font-medium">Client Name *</Label>
-              <Input
-                id="clientName"
-                name="clientName"
-                placeholder="John Doe"
-                required
-                className="bg-white border-slate-300 focus-visible:ring-blue-500 text-slate-900"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="clientPhone" className="text-slate-700 font-medium">Client Phone</Label>
-              <Input
-                id="clientPhone"
-                name="clientPhone"
-                placeholder="+1 (555) 000-0000"
-                className="bg-white border-slate-300 focus-visible:ring-blue-500 text-slate-900"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="clientEmail" className="text-slate-700 font-medium">Client Email</Label>
-              <Input
-                id="clientEmail"
-                name="clientEmail"
-                type="email"
-                placeholder="client@example.com"
-                className="bg-white border-slate-300 focus-visible:ring-blue-500 text-slate-900"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="location" className="text-slate-700 font-medium">Site Location</Label>
-              <Input
-                id="location"
-                name="location"
-                placeholder="City, Area"
-                className="bg-white border-slate-300 focus-visible:ring-blue-500 text-slate-900"
-              />
-            </div>
-
-            <div className="space-y-2 col-span-1 md:col-span-2">
-              <Label htmlFor="address" className="text-slate-700 font-medium">Full Address</Label>
-              <Input
-                id="address"
-                name="address"
-                placeholder="123 Construction Ave..."
-                className="bg-white border-slate-300 focus-visible:ring-blue-500 text-slate-900"
               />
             </div>
 

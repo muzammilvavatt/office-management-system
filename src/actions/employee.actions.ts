@@ -24,9 +24,11 @@ export async function createEmployeeAction(prevState: any, formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const role = formData.get("role") as string;
+  const projectRoles = formData.getAll("projectRoles") as string[];
+  const dailyResponsibilities = formData.getAll("dailyResponsibilities") as string[];
 
   if (!name || !email || !password || !role) {
-    return { error: "All fields are required" };
+    return { error: "All required fields must be filled" };
   }
 
   // Check if email already exists
@@ -46,6 +48,12 @@ export async function createEmployeeAction(prevState: any, formData: FormData) {
         email,
         passwordHash,
         role,
+        projectRoles: {
+          create: projectRoles.map(id => ({ projectRoleId: id }))
+        },
+        dailyResponsibilities: {
+          create: dailyResponsibilities.map(id => ({ dailyResponsibilityId: id }))
+        }
       },
     });
   } catch (error) {
@@ -67,10 +75,6 @@ export async function toggleEmployeeStatus(id: string, currentStatus: boolean) {
 
 export async function deleteEmployeeAction(id: string) {
   await requireAdmin();
-  // Disconnect or delete related data as needed
-  // Note: in a real system we might re-assign tasks before deletion,
-  // but for now, we rely on prisma cascading or manual cleanup if needed.
-  // We'll just delete the user. Prisma schema uses cascade on TaskAssignee.
   await prisma.user.delete({
     where: { id },
   });
@@ -88,6 +92,8 @@ export async function editEmployeeAction(id: string, prevState: any, formData: F
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const role = formData.get("role") as string;
+  const projectRoles = formData.getAll("projectRoles") as string[];
+  const dailyResponsibilities = formData.getAll("dailyResponsibilities") as string[];
 
   if (!name || !email || !role) {
     return { error: "Name, Email, and Role are required" };
@@ -101,17 +107,29 @@ export async function editEmployeeAction(id: string, prevState: any, formData: F
 
   const updateData: any = { name, email, role };
 
-  // Only update password if provided
   if (password) {
     const salt = bcrypt.genSaltSync(10);
     updateData.passwordHash = bcrypt.hashSync(password, salt);
   }
 
   try {
-    await prisma.user.update({
-      where: { id },
-      data: updateData,
-    });
+    // We use a transaction because we need to clear old relations and insert new ones
+    await prisma.$transaction([
+      prisma.userProjectRole.deleteMany({ where: { userId: id } }),
+      prisma.userDailyResponsibility.deleteMany({ where: { userId: id } }),
+      prisma.user.update({
+        where: { id },
+        data: {
+          ...updateData,
+          projectRoles: {
+            create: projectRoles.map(rId => ({ projectRoleId: rId }))
+          },
+          dailyResponsibilities: {
+            create: dailyResponsibilities.map(rId => ({ dailyResponsibilityId: rId }))
+          }
+        },
+      })
+    ]);
   } catch (error) {
     return { error: "Failed to update employee" };
   }

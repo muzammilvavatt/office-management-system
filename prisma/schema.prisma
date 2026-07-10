@@ -13,7 +13,7 @@ model User {
   email         String         @unique
   passwordHash  String
   name          String
-  role          String         @default("CIVIL_ENGINEER") // Admin, Architect, etc.
+  role          String         @default("EMPLOYEE") // ADMIN, EMPLOYEE
   isActive      Boolean        @default(true)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -23,6 +23,10 @@ model User {
   notifications Notification[]
   activityLogs  ActivityLog[]
   attendances   Attendance[]
+
+  projectRoles           UserProjectRole[]
+  dailyResponsibilities  UserDailyResponsibility[]
+  dailyTaskLogs          DailyTaskLog[]
 }
 
 model Project {
@@ -132,4 +136,55 @@ model Attendance {
   status    String    @default("PRESENT") // PRESENT, HALF_DAY, LATE
 
   createdAt DateTime  @default(now())
+}
+
+model ProjectRole {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  
+  users       UserProjectRole[]
+}
+
+model UserProjectRole {
+  userId        String
+  projectRoleId String
+  
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectRole   ProjectRole @relation(fields: [projectRoleId], references: [id], onDelete: Cascade)
+  
+  @@id([userId, projectRoleId])
+}
+
+model DailyResponsibility {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  
+  users       UserDailyResponsibility[]
+  logs        DailyTaskLog[]
+}
+
+model UserDailyResponsibility {
+  userId                String
+  dailyResponsibilityId String
+  
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyResponsibility DailyResponsibility @relation(fields: [dailyResponsibilityId], references: [id], onDelete: Cascade)
+  
+  @@id([userId, dailyResponsibilityId])
+}
+
+model DailyTaskLog {
+  id                     String   @id @default(cuid())
+  userId                 String
+  dailyResponsibilityId  String
+  date                   DateTime // e.g. start of day
+  status                 String   @default("PENDING") // PENDING, COMPLETED
+  completedAt            DateTime?
+
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyResponsibility DailyResponsibility @relation(fields: [dailyResponsibilityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dailyResponsibilityId, date])
 }

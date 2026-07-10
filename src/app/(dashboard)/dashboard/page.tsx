@@ -5,6 +5,7 @@ import { getSession } from "@/lib/session";
 import { TaskDistributionChart } from "@/components/charts/TaskDistributionChart";
 import { EmployeeWorkloadChart } from "@/components/charts/EmployeeWorkloadChart";
 import { AttendanceTracker } from "@/components/AttendanceTracker";
+import { DailyChecklist } from "@/components/DailyChecklist";
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -51,6 +52,8 @@ export default async function DashboardPage() {
 
   // Fetch today's attendance record for the logged-in user
   let todayRecord = null;
+  let dailyChecklistData: any[] = [];
+  
   if (session?.user?.id) {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -61,15 +64,47 @@ export default async function DashboardPage() {
         date: { gte: todayStart },
       }
     });
+
+    if (session.user.role !== "ADMIN") {
+      // Fetch daily responsibilities mapped to this user
+      const userResp = await prisma.userDailyResponsibility.findMany({
+        where: { userId: session.user.id },
+        include: { dailyResponsibility: true }
+      });
+
+      // Fetch logs for today
+      const todaysLogs = await prisma.dailyTaskLog.findMany({
+        where: {
+          userId: session.user.id,
+          date: todayStart,
+        }
+      });
+
+      // Combine them
+      dailyChecklistData = userResp.map(ur => {
+        const log = todaysLogs.find(l => l.dailyResponsibilityId === ur.dailyResponsibilityId);
+        return {
+          id: ur.dailyResponsibilityId,
+          name: ur.dailyResponsibility.name,
+          description: ur.dailyResponsibility.description,
+          status: log?.status || "PENDING",
+        };
+      });
+    }
   }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       
-      {/* Attendance Tracker Widget - Hidden for Admins */}
+      {/* Employee Specific Widgets - Hidden for Admins */}
       {session?.user?.id && session.user.role !== "ADMIN" && (
-        <div className="mb-6 max-w-sm">
-          <AttendanceTracker todayRecord={todayRecord} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <AttendanceTracker todayRecord={todayRecord} />
+          </div>
+          <div>
+            <DailyChecklist tasks={dailyChecklistData} />
+          </div>
         </div>
       )}
 

@@ -1,4 +1,3 @@
-import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, FolderPlus } from "lucide-react";
@@ -6,11 +5,6 @@ import Link from "next/link";
 import { AddProjectForm } from "@/components/AddProjectForm";
 
 export default async function AddProjectPage() {
-  const employees = await prisma.user.findMany({
-    where: { isActive: true },
-    orderBy: { name: "asc" }
-  });
-
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-10">
       <div className="flex items-center space-x-4">
@@ -29,13 +23,15 @@ export default async function AddProjectPage() {
         <CardHeader className="border-b border-slate-100 pb-4">
           <CardTitle className="flex items-center text-lg font-bold">
             <FolderPlus className="w-5 h-5 mr-2 text-blue-600" />
-            Project Details & Workflow
+            Project Details
           </CardTitle>
           <CardDescription className="text-slate-500">
-            Fill in the essential details and define the sequential task workflow.
+            Tasks will be generated and assigned automatically based on employee roles.
           </CardDescription>
         </CardHeader>
-        <AddProjectForm employees={employees} />
+        <div className="p-6">
+          <AddProjectForm />
+        </div>
       </Card>
     </div>
   );

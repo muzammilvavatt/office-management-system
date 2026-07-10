@@ -1,57 +1,76 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/session";
 
-export async function changePasswordAction(prevState: any, formData: FormData) {
+async function requireAdmin() {
   const session = await getSession();
-  if (!session || !session.user?.id) {
-    return { error: "Unauthorized" };
+  if (!session || session.user?.role !== "ADMIN") {
+    throw new Error("Unauthorized: Admin access required.");
+  }
+}
+
+// --- PROJECT ROLES ---
+
+export async function createProjectRoleAction(prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+  } catch (err: any) {
+    return { error: err.message };
   }
 
-  const currentPassword = formData.get("currentPassword") as string;
-  const newPassword = formData.get("newPassword") as string;
-  const confirmPassword = formData.get("confirmPassword") as string;
+  const name = formData.get("name") as string;
+  const description = formData.get("description") as string;
 
-  if (!currentPassword || !newPassword || !confirmPassword) {
-    return { error: "All fields are required" };
-  }
-
-  if (newPassword !== confirmPassword) {
-    return { error: "New passwords do not match" };
-  }
-
-  if (newPassword.length < 6) {
-    return { error: "New password must be at least 6 characters long" };
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
-
-  if (!user) {
-    return { error: "User not found" };
-  }
-
-  const isValid = 
-    user.passwordHash === currentPassword || 
-    bcrypt.compareSync(currentPassword, user.passwordHash);
-
-  if (!isValid) {
-    return { error: "Incorrect current password" };
-  }
-
-  const salt = bcrypt.genSaltSync(10);
-  const passwordHash = bcrypt.hashSync(newPassword, salt);
+  if (!name) return { error: "Name is required" };
 
   try {
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { passwordHash },
+    await prisma.projectRole.create({
+      data: { name, description },
     });
-    return { success: "Password successfully updated!" };
   } catch (error) {
-    return { error: "Failed to update password" };
+    return { error: "Failed to create Project Role. Name may already exist." };
   }
+
+  revalidatePath("/dashboard/settings/roles");
+  return { success: true };
+}
+
+export async function deleteProjectRoleAction(id: string) {
+  await requireAdmin();
+  await prisma.projectRole.delete({ where: { id } });
+  revalidatePath("/dashboard/settings/roles");
+}
+
+// --- DAILY RESPONSIBILITIES ---
+
+export async function createDailyResponsibilityAction(prevState: any, formData: FormData) {
+  try {
+    await requireAdmin();
+  } catch (err: any) {
+    return { error: err.message };
+  }
+
+  const name = formData.get("name") as string;
+  const description = formData.get("description") as string;
+
+  if (!name) return { error: "Name is required" };
+
+  try {
+    await prisma.dailyResponsibility.create({
+      data: { name, description },
+    });
+  } catch (error) {
+    return { error: "Failed to create Daily Responsibility. Name may already exist." };
+  }
+
+  revalidatePath("/dashboard/settings/roles");
+  return { success: true };
+}
+
+export async function deleteDailyResponsibilityAction(id: string) {
+  await requireAdmin();
+  await prisma.dailyResponsibility.delete({ where: { id } });
+  revalidatePath("/dashboard/settings/roles");
 }
