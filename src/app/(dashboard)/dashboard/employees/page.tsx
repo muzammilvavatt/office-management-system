@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Users, Plus, UserCircle, CheckCircle2, XCircle, Trash2, Pencil } from "lucide-react";
-import { toggleEmployeeStatus, deleteEmployeeAction } from "@/actions/employee.actions";
+import { toggleEmployeeStatus, toggleEmployeeWFH, deleteEmployeeAction } from "@/actions/employee.actions";
 import { getSession } from "@/lib/session";
 import { DeleteButton } from "@/components/DeleteButton";
 
@@ -38,6 +38,7 @@ export default async function EmployeesPage() {
               <tr>
                 <th scope="col" className="px-6 py-4 font-semibold">Name</th>
                 <th scope="col" className="px-6 py-4 font-semibold">Role</th>
+                <th scope="col" className="px-6 py-4 font-semibold">Work Mode</th>
                 <th scope="col" className="px-6 py-4 font-semibold">Status</th>
                 <th scope="col" className="px-6 py-4 font-semibold">Joined</th>
                 {isAdmin && <th scope="col" className="px-6 py-4 text-right font-semibold">Actions</th>}
@@ -61,6 +62,11 @@ export default async function EmployeesPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${employee.isWFH ? 'bg-purple-50 text-purple-700' : 'bg-slate-100 text-slate-700'}`}>
+                      {employee.isWFH ? "WFH" : "Office"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
                     {employee.isActive ? (
                       <span className="flex items-center text-green-600 text-xs font-medium">
                         <CheckCircle2 className="w-4 h-4 mr-1.5" /> Active
@@ -77,6 +83,19 @@ export default async function EmployeesPage() {
                   {isAdmin && (
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end items-center space-x-2">
+                        <form action={toggleEmployeeWFH.bind(null, employee.id, employee.isWFH)}>
+                          <Button 
+                            type="submit" 
+                            variant="ghost" 
+                            size="sm"
+                            className={employee.isWFH 
+                              ? "text-purple-600 hover:text-purple-700 hover:bg-purple-50" 
+                              : "text-slate-600 hover:text-slate-700 hover:bg-slate-100"
+                            }
+                          >
+                            {employee.isWFH ? "Set Office" : "Set WFH"}
+                          </Button>
+                        </form>
                         <form action={toggleEmployeeStatus.bind(null, employee.id, employee.isActive)}>
                           <Button 
                             type="submit" 
@@ -110,7 +129,7 @@ export default async function EmployeesPage() {
               ))}
               {employees.length === 0 && (
                 <tr>
-                  <td colSpan={isAdmin ? 5 : 4} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={isAdmin ? 6 : 5} className="px-6 py-12 text-center text-slate-500">
                     No employees found. Add your first team member!
                   </td>
                 </tr>

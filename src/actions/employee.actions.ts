@@ -73,6 +73,15 @@ export async function toggleEmployeeStatus(id: string, currentStatus: boolean) {
   revalidatePath("/dashboard/employees");
 }
 
+export async function toggleEmployeeWFH(id: string, currentStatus: boolean) {
+  await requireAdmin();
+  await prisma.user.update({
+    where: { id },
+    data: { isWFH: !currentStatus },
+  });
+  revalidatePath("/dashboard/employees");
+}
+
 export async function deleteEmployeeAction(id: string) {
   await requireAdmin();
   await prisma.user.delete({
