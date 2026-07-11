@@ -22,7 +22,7 @@ export async function createTaskAction(prevState: any, formData: FormData) {
 
   let allottedHours = null;
   if (allottedHoursStr) {
-    allottedHours = parseInt(allottedHoursStr, 10);
+    allottedHours = parseFloat(allottedHoursStr);
   }
 
   const session = await getSession();
@@ -159,10 +159,10 @@ export async function requestTimeExtensionAction(taskId: string, formData: FormD
   const session = await getSession();
   if (!session) return { error: "Unauthorized" };
 
-  const hours = parseInt(formData.get("hours") as string, 10);
+  const hours = parseFloat(formData.get("hours") as string);
   const reason = formData.get("reason") as string;
 
-  if (!hours || !reason) return { error: "Hours and reason are required" };
+  if (isNaN(hours) || hours <= 0 || !reason) {return { error: "Hours and reason are required" };}
 
   await prisma.task.update({
     where: { id: taskId },

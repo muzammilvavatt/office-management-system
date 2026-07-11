@@ -140,9 +140,10 @@ export function EmployeeTaskActions({ taskId, status, allottedHours, timeSpentMs
               <input 
                 type="number" 
                 name="hours" 
-                min="1" 
+                min="0" 
+                step="any"
                 required 
-                placeholder="Extra hours needed..."
+                placeholder="Extra time (e.g. 0.5 for 30m)..."
                 className="h-8 text-sm rounded border px-2 border-amber-200"
                 disabled={isPending}
               />

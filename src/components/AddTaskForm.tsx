@@ -107,12 +107,13 @@ export function AddTaskForm({ projects, employees, tasks = [] }: { projects: any
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="allottedHours" className="text-slate-700 font-medium">Allotted Time (Hours) *</Label>
+            <Label htmlFor="allottedHours" className="text-slate-700 font-medium">Allotted Time (Hours, e.g. 0.5 for 30 mins) *</Label>
             <Input
               id="allottedHours"
               name="allottedHours"
               type="number"
-              min="1"
+              step="any"
+              min="0"
               required
               placeholder="e.g. 4"
               className="bg-white border-slate-300 focus-visible:ring-blue-500 block text-slate-900"

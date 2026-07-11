@@ -61,12 +61,12 @@ model Task {
   notes       String?
 
   // Time Tracking & Delegation
-  allottedHours            Int?
+  allottedHours            Float?
   startedAt                DateTime?
   timeSpentMs              Int          @default(0)
   lastTimerStart           DateTime?
   completedAt              DateTime?
-  extensionRequestedHours  Int?
+  extensionRequestedHours  Float?
   extensionReason          String?
 
   projectId   String
