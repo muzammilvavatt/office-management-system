@@ -39,7 +39,7 @@ export async function clockInAction(coords?: { lat: number, lng: number }) {
     const dist2 = getDistanceFromLatLonInMeters(coords.lat, coords.lng, OFFICE2.lat, OFFICE2.lng);
     
     if (dist1 > MAX_RADIUS_METERS && dist2 > MAX_RADIUS_METERS) {
-      return { error: "You are not within the 100m range of any office premises." };
+      return { error: "You are not in the office." };
     }
   }
 
