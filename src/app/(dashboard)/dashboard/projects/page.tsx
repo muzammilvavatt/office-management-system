@@ -78,7 +78,7 @@ export default async function ProjectsPage() {
                     {project._count.tasks}
                   </td>
                   <td className="px-6 py-4 text-slate-600">
-                    {project.deadline ? new Date(project.deadline).toLocaleDateString() : "—"}
+                    {project.deadline ? new Date(project.deadline).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' }) : "—"}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end items-center space-x-2">

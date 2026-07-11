@@ -72,7 +72,7 @@ export default async function EmployeesPage() {
                     )}
                   </td>
                   <td className="px-6 py-4 text-slate-500">
-                    {new Date(employee.createdAt).toLocaleDateString()}
+                    {new Date(employee.createdAt).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}
                   </td>
                   {isAdmin && (
                     <td className="px-6 py-4 text-right">

@@ -24,8 +24,10 @@ export function EmployeeDashboard({
   const firstName = user?.name ? user.name.split(' ')[0] : 'Employee';
   const pendingChecklistCount = dailyChecklistData.filter(t => t.status === "PENDING").length;
   
-  const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  const todayStr = new Date().toLocaleDateString(undefined, options);
+  const options: Intl.DateTimeFormatOptions = { 
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Kolkata' 
+  };
+  const todayStr = new Date().toLocaleDateString('en-IN', options);
 
   return (
     <div className="space-y-6">
@@ -126,7 +128,7 @@ export function EmployeeDashboard({
                               Details
                             </Button>
                           </Link>
-                          <EmployeeTaskActions taskId={task.id} status={task.status} allottedHours={task.allottedHours} />
+                          <EmployeeTaskActions taskId={task.id} status={task.status} allottedHours={task.allottedHours} startedAt={task.startedAt} />
                         </div>
                       </div>
                     );

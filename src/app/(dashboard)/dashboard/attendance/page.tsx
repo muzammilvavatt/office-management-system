@@ -56,7 +56,7 @@ export default async function AttendanceAdminPage(props: { searchParams?: Promis
 
   const formatTime = (date?: Date | null) => {
     if (!date) return "--:--";
-    return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(date).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' });
   };
 
   const calculateHours = (inTime: Date, outTime?: Date | null) => {

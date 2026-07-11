@@ -3,9 +3,53 @@
 import { Button } from "@/components/ui/button";
 import { startTaskAction, completeTaskAction, requestTimeExtensionAction } from "@/actions/task.actions";
 import { Play, Check, Clock, Loader2 } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
-export function EmployeeTaskActions({ taskId, status, allottedHours }: { taskId: string, status: string, allottedHours: number | null }) {
+function TaskTimer({ startedAt, allottedHours }: { startedAt: Date | string; allottedHours: number }) {
+  const [timeLeft, setTimeLeft] = useState<string>("");
+  const [isOverdue, setIsOverdue] = useState(false);
+
+  useEffect(() => {
+    const start = new Date(startedAt).getTime();
+    const allottedMs = allottedHours * 60 * 60 * 1000;
+    const deadline = start + allottedMs;
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const diff = deadline - now;
+      
+      if (diff < 0) {
+        setIsOverdue(true);
+        const overMs = Math.abs(diff);
+        const h = Math.floor(overMs / 3600000).toString().padStart(2, '0');
+        const m = Math.floor((overMs % 3600000) / 60000).toString().padStart(2, '0');
+        const s = Math.floor((overMs % 60000) / 1000).toString().padStart(2, '0');
+        setTimeLeft(`-${h}:${m}:${s}`);
+      } else {
+        setIsOverdue(false);
+        const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+        const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+        const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+        setTimeLeft(`${h}:${m}:${s}`);
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [startedAt, allottedHours]);
+
+  if (!timeLeft) return null;
+
+  return (
+    <div className={`flex items-center text-xs font-bold px-3 py-1.5 rounded-md border ${isOverdue ? 'bg-red-50 text-red-700 border-red-200' : 'bg-slate-50 text-slate-700 border-slate-200'} mb-2 w-full justify-center`}>
+      <Clock className="w-3.5 h-3.5 mr-1.5" />
+      {isOverdue ? 'Overdue: ' : 'Time Left: '} {timeLeft}
+    </div>
+  );
+}
+
+export function EmployeeTaskActions({ taskId, status, allottedHours, startedAt }: { taskId: string, status: string, allottedHours: number | null, startedAt?: string | Date | null }) {
   const [isRequesting, setIsRequesting] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [activeAction, setActiveAction] = useState<string | null>(null);
@@ -59,6 +103,7 @@ export function EmployeeTaskActions({ taskId, status, allottedHours }: { taskId:
 
       {status === "IN_PROGRESS" && (
         <>
+          {startedAt && allottedHours && <TaskTimer startedAt={startedAt} allottedHours={allottedHours} />}
           <Button 
             onClick={handleCompleteTask} 
             disabled={isPending} 

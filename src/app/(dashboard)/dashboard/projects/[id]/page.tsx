@@ -81,7 +81,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               {project.deadline && (
                 <div>
                   <span className="text-slate-500 font-medium block">Deadline</span>
-                  <span className="font-semibold">{new Date(project.deadline).toLocaleDateString()}</span>
+                  <span className="font-semibold">{new Date(project.deadline).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' })}</span>
                 </div>
               )}
             </CardContent>

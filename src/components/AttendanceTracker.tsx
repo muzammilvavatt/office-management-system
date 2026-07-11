@@ -26,7 +26,7 @@ export function AttendanceTracker({ todayRecord }: { todayRecord: any }) {
 
   // Format time (e.g. 9:00 AM)
   const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(dateStr).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' });
   };
 
   return (
@@ -38,7 +38,7 @@ export function AttendanceTracker({ todayRecord }: { todayRecord: any }) {
             Time Tracker
           </h3>
           <span className="text-blue-100 text-sm font-medium" suppressHydrationWarning>
-            {new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+            {new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', month: 'short', day: 'numeric' })}
           </span>
         </div>
       </div>

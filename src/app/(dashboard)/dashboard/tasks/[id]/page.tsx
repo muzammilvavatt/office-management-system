@@ -96,7 +96,7 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
                 <div>
                   <span className="text-slate-500 font-medium block">Time Started</span>
                   <span className="font-semibold">
-                    {task.startedAt ? new Date(task.startedAt).toLocaleString() : "Not started"}
+                    {task.startedAt ? new Date(task.startedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) : "Not started"}
                   </span>
                 </div>
               </div>
