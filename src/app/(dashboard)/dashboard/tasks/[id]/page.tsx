@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, CheckSquare, FileText, Download } from "lucide-react";
+import { ArrowLeft, CheckSquare, FileText, Download, Clock } from "lucide-react";
 import { notFound } from "next/navigation";
 import { FileUpload } from "@/components/FileUpload";
 import { TaskActivityFeed } from "@/components/TaskActivityFeed";
