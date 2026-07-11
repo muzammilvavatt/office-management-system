@@ -2,9 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { writeFile } from "fs/promises";
-import { join } from "path";
 import { getSession } from "@/lib/session";
+import { supabase } from "@/lib/supabase";
 
 export async function uploadFileAction(formData: FormData) {
   const session = await getSession();
@@ -23,23 +22,31 @@ export async function uploadFileAction(formData: FormData) {
 
   // Generate unique filename
   const uniqueName = `${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
-  const uploadDir = join(process.cwd(), "public", "uploads");
-  const path = join(uploadDir, uniqueName);
   
-  // In a real app, ensure the uploadDir exists first
   try {
-    const fs = await import("fs");
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("uploads")
+      .upload(uniqueName, buffer, {
+        contentType: file.type || "application/octet-stream",
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error("Supabase Storage Error:", uploadError);
+      return { error: "Failed to upload file to cloud storage." };
     }
-    
-    await writeFile(path, buffer);
+
+    // Get the public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from("uploads")
+      .getPublicUrl(uniqueName);
     
     // Save to DB
     await prisma.file.create({
       data: {
         name: file.name,
-        url: `/uploads/${uniqueName}`,
+        url: publicUrl,
         type: file.type || "application/octet-stream",
         size: file.size,
         uploadedById: session.user.id,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import { useActionState, useRef, useEffect } from "react";
 import { createProjectRoleAction } from "@/actions/settings.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,10 +11,11 @@ export function AddProjectRoleForm() {
   const formRef = useRef<HTMLFormElement>(null);
 
   // If successful, reset form
-  if (state?.success && formRef.current) {
-    formRef.current.reset();
-    state.success = false;
-  }
+  useEffect(() => {
+    if (state?.success && formRef.current) {
+      formRef.current.reset();
+    }
+  }, [state?.success]);
 
   return (
     <form ref={formRef} action={formAction} className="space-y-3">

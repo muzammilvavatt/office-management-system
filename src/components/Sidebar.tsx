@@ -13,7 +13,9 @@ export function Sidebar({ isAdmin }: { isAdmin: boolean }) {
 
   // Close mobile sidebar on route change
   useEffect(() => {
-    setIsMobileOpen(false);
+    if (isMobileOpen) {
+      setIsMobileOpen(false);
+    }
   }, [pathname]);
 
   const links = [
