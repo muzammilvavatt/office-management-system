@@ -62,6 +62,8 @@ model Task {
   // Time Tracking & Delegation
   allottedHours            Int?
   startedAt                DateTime?
+  timeSpentMs              Int          @default(0)
+  lastTimerStart           DateTime?
   completedAt              DateTime?
   extensionRequestedHours  Int?
   extensionReason          String?

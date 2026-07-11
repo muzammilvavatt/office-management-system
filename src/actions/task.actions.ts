@@ -79,6 +79,7 @@ export async function startTaskAction(taskId: string) {
     data: {
       status: "IN_PROGRESS",
       startedAt: new Date(),
+      lastTimerStart: new Date(),
       progress: 10,
     }
   });
@@ -101,11 +102,22 @@ export async function completeTaskAction(taskId: string) {
   const session = await getSession();
   if (!session) return { error: "Unauthorized" };
 
+  const task = await prisma.task.findUnique({ where: { id: taskId } });
+  if (!task) return { error: "Task not found" };
+
+  const now = new Date();
+  let addMs = 0;
+  if (task.lastTimerStart) {
+    addMs = now.getTime() - new Date(task.lastTimerStart).getTime();
+  }
+
   await prisma.task.update({
     where: { id: taskId },
     data: {
       status: "COMPLETED",
-      completedAt: new Date(),
+      completedAt: now,
+      timeSpentMs: task.timeSpentMs + addMs,
+      lastTimerStart: null,
       progress: 100,
     }
   });

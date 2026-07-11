@@ -29,6 +29,8 @@ export function EmployeeDashboard({
   };
   const todayStr = new Date().toLocaleDateString('en-IN', options);
 
+  const isClockedIn = !!(todayRecord && !todayRecord.clockOut);
+
   return (
     <div className="space-y-6">
       {/* Greeting Header */}
@@ -128,7 +130,7 @@ export function EmployeeDashboard({
                               Details
                             </Button>
                           </Link>
-                          <EmployeeTaskActions taskId={task.id} status={task.status} allottedHours={task.allottedHours} startedAt={task.startedAt} />
+                          <EmployeeTaskActions taskId={task.id} status={task.status} allottedHours={task.allottedHours} timeSpentMs={task.timeSpentMs} lastTimerStart={task.lastTimerStart} isClockedIn={isClockedIn} />
                         </div>
                       </div>
                     );

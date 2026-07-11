@@ -50,6 +50,17 @@ export async function clockInAction() {
     }
   });
 
+  // Resume all IN_PROGRESS tasks
+  await prisma.task.updateMany({
+    where: {
+      status: "IN_PROGRESS",
+      assignees: { some: { userId } }
+    },
+    data: {
+      lastTimerStart: now
+    }
+  });
+
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/attendance");
 }
@@ -90,6 +101,29 @@ export async function clockOutAction() {
     where: { id: existingRecord.id },
     data: { clockOut: now }
   });
+
+  // Pause all IN_PROGRESS tasks
+  const activeTasks = await prisma.task.findMany({
+    where: {
+      status: "IN_PROGRESS",
+      assignees: { some: { userId } }
+    }
+  });
+
+  for (const task of activeTasks) {
+    let addMs = 0;
+    if (task.lastTimerStart) {
+      addMs = now.getTime() - new Date(task.lastTimerStart).getTime();
+    }
+    
+    await prisma.task.update({
+      where: { id: task.id },
+      data: {
+        timeSpentMs: task.timeSpentMs + addMs,
+        lastTimerStart: null
+      }
+    });
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/attendance");

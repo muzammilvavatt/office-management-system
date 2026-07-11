@@ -5,18 +5,19 @@ import { startTaskAction, completeTaskAction, requestTimeExtensionAction } from 
 import { Play, Check, Clock, Loader2 } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 
-function TaskTimer({ startedAt, allottedHours }: { startedAt: Date | string; allottedHours: number }) {
+function TaskTimer({ timeSpentMs, lastTimerStart, allottedHours }: { timeSpentMs: number; lastTimerStart: Date | string | null; allottedHours: number }) {
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [isOverdue, setIsOverdue] = useState(false);
 
   useEffect(() => {
-    const start = new Date(startedAt).getTime();
-    const allottedMs = allottedHours * 60 * 60 * 1000;
-    const deadline = start + allottedMs;
-
     const updateTimer = () => {
-      const now = Date.now();
-      const diff = deadline - now;
+      let activeMs = timeSpentMs;
+      if (lastTimerStart) {
+        activeMs += Date.now() - new Date(lastTimerStart).getTime();
+      }
+      
+      const allottedMs = allottedHours * 60 * 60 * 1000;
+      const diff = allottedMs - activeMs;
       
       if (diff < 0) {
         setIsOverdue(true);
@@ -37,7 +38,7 @@ function TaskTimer({ startedAt, allottedHours }: { startedAt: Date | string; all
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [startedAt, allottedHours]);
+  }, [timeSpentMs, lastTimerStart, allottedHours]);
 
   if (!timeLeft) return null;
 
@@ -45,11 +46,12 @@ function TaskTimer({ startedAt, allottedHours }: { startedAt: Date | string; all
     <div className={`flex items-center text-xs font-bold px-3 py-1.5 rounded-md border ${isOverdue ? 'bg-red-50 text-red-700 border-red-200' : 'bg-slate-50 text-slate-700 border-slate-200'} mb-2 w-full justify-center`}>
       <Clock className="w-3.5 h-3.5 mr-1.5" />
       {isOverdue ? 'Overdue: ' : 'Time Left: '} {timeLeft}
+      {!lastTimerStart && <span className="ml-2 text-amber-600">(Paused)</span>}
     </div>
   );
 }
 
-export function EmployeeTaskActions({ taskId, status, allottedHours, startedAt }: { taskId: string, status: string, allottedHours: number | null, startedAt?: string | Date | null }) {
+export function EmployeeTaskActions({ taskId, status, allottedHours, timeSpentMs = 0, lastTimerStart, isClockedIn }: { taskId: string, status: string, allottedHours: number | null, timeSpentMs?: number, lastTimerStart?: string | Date | null, isClockedIn?: boolean }) {
   const [isRequesting, setIsRequesting] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [activeAction, setActiveAction] = useState<string | null>(null);
@@ -89,10 +91,16 @@ export function EmployeeTaskActions({ taskId, status, allottedHours, startedAt }
 
   return (
     <div className="flex flex-col gap-2 w-full sm:w-auto">
+      {!isClockedIn && (status === "PENDING" || status === "IN_PROGRESS") && (
+        <div className="text-xs font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-md border border-amber-200 mb-1 text-center">
+          Please clock in to work on tasks
+        </div>
+      )}
+
       {status === "PENDING" && (
         <Button 
           onClick={handleStartTask} 
-          disabled={isPending} 
+          disabled={isPending || !isClockedIn} 
           size="sm" 
           className="w-full bg-blue-600 hover:bg-blue-700 text-white"
         >
@@ -103,10 +111,10 @@ export function EmployeeTaskActions({ taskId, status, allottedHours, startedAt }
 
       {status === "IN_PROGRESS" && (
         <>
-          {startedAt && allottedHours && <TaskTimer startedAt={startedAt} allottedHours={allottedHours} />}
+          {allottedHours !== null && <TaskTimer timeSpentMs={timeSpentMs} lastTimerStart={lastTimerStart ?? null} allottedHours={allottedHours} />}
           <Button 
             onClick={handleCompleteTask} 
-            disabled={isPending} 
+            disabled={isPending || !isClockedIn} 
             size="sm" 
             className="w-full bg-green-600 hover:bg-green-700 text-white"
           >
@@ -121,7 +129,7 @@ export function EmployeeTaskActions({ taskId, status, allottedHours, startedAt }
               size="sm" 
               className="w-full text-amber-600 border-amber-200 hover:bg-amber-50"
               onClick={() => setIsRequesting(true)}
-              disabled={isPending}
+              disabled={isPending || !isClockedIn}
             >
               <Clock className="w-4 h-4 mr-2" />
               Request More Time
