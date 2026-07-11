@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { getNotificationsAction } from "@/actions/notification.actions";
+import { getNotificationsAction, markNotificationsAsReadAction } from "@/actions/notification.actions";
 
 export function NotificationBell() {
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -18,8 +18,16 @@ export function NotificationBell() {
     fetchNotifs();
   }, []);
 
+  const handleOpenChange = (open: boolean) => {
+    if (open && unreadCount > 0) {
+      setUnreadCount(0);
+      markNotificationsAsReadAction();
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    }
+  };
+
   return (
-    <Popover>
+    <Popover onOpenChange={handleOpenChange}>
       <PopoverTrigger className="relative inline-flex items-center justify-center rounded-full h-8 w-8 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
         <Bell className="w-4 h-4" />
         {unreadCount > 0 && (

@@ -23,3 +23,22 @@ export async function getNotificationsAction() {
     return { notifications: [] };
   }
 }
+
+export async function markNotificationsAsReadAction() {
+  const session = await getSession();
+  if (!session?.user?.id) return { success: false };
+
+  try {
+    await prisma.notification.updateMany({
+      where: { 
+        userId: session.user.id,
+        isRead: false
+      },
+      data: { isRead: true }
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to mark notifications as read:", error);
+    return { success: false };
+  }
+}
