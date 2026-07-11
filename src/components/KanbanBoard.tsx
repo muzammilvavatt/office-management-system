@@ -42,6 +42,7 @@ export function KanbanBoard({ initialTasks }: { initialTasks: Task[] }) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
   // Sync state if props change (e.g., from server revalidation)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setTasks(initialTasks);
   }, [initialTasks]);
@@ -69,8 +70,8 @@ export function KanbanBoard({ initialTasks }: { initialTasks: Task[] }) {
 
   const getTasksByStatus = (status: string) => {
     return tasks.filter((t) => {
-      // Map REVIEW to IN_PROGRESS for display purposes if any exist
-      if (status === "IN_PROGRESS" && t.status === "REVIEW") return true;
+      // Map REVIEW or TIME_EXTENSION_REQUESTED to IN_PROGRESS for display purposes
+      if (status === "IN_PROGRESS" && (t.status === "REVIEW" || t.status === "TIME_EXTENSION_REQUESTED")) return true;
       return t.status === status;
     });
   };
@@ -101,6 +102,7 @@ export function KanbanBoard({ initialTasks }: { initialTasks: Task[] }) {
                   >
                     {columnTasks.map((task, index) => {
                       const isBlocked = task.dependsOn && task.dependsOn.status !== "COMPLETED";
+                      const isExtensionRequested = task.status === "TIME_EXTENSION_REQUESTED";
 
                       return (
                       <Draggable key={task.id} draggableId={task.id} index={index} isDragDisabled={!!isBlocked}>
@@ -135,6 +137,11 @@ export function KanbanBoard({ initialTasks }: { initialTasks: Task[] }) {
                               {isBlocked && (
                                 <p className="text-[10px] font-semibold text-amber-600 mb-2 bg-amber-50 px-2 py-1 rounded inline-block">
                                   Waiting on: {task.dependsOn!.name}
+                                </p>
+                              )}
+                              {isExtensionRequested && (
+                                <p className="text-[10px] font-semibold text-amber-700 mb-2 bg-amber-100 px-2 py-1 rounded inline-block w-full text-center">
+                                  Time Extension Requested!
                                 </p>
                               )}
                             </Link>

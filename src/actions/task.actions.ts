@@ -14,14 +14,15 @@ export async function createTaskAction(prevState: any, formData: FormData) {
   const projectId = formData.get("projectId") as string;
   const assigneeId = formData.get("assigneeId") as string;
   const dependsOnId = formData.get("dependsOnId") as string;
+  const allottedHoursStr = formData.get("allottedHours") as string;
 
   if (!name || !category || !projectId || !assigneeId) {
     return { error: "Name, Category, Project, and Assignee are required." };
   }
 
-  let deadline = null;
-  if (deadlineStr) {
-    deadline = new Date(deadlineStr);
+  let allottedHours = null;
+  if (allottedHoursStr) {
+    allottedHours = parseInt(allottedHoursStr, 10);
   }
 
   const session = await getSession();
@@ -32,7 +33,7 @@ export async function createTaskAction(prevState: any, formData: FormData) {
         name,
         category,
         priority: priority || "MEDIUM",
-        deadline,
+        allottedHours,
         notes: notes || null,
         projectId,
         dependsOnId: dependsOnId || null,
@@ -67,6 +68,125 @@ export async function createTaskAction(prevState: any, formData: FormData) {
   revalidatePath(`/dashboard/projects/${projectId}`);
   revalidatePath("/dashboard");
   redirect("/dashboard/tasks");
+}
+
+export async function startTaskAction(taskId: string) {
+  const session = await getSession();
+  if (!session) return { error: "Unauthorized" };
+
+  await prisma.task.update({
+    where: { id: taskId },
+    data: {
+      status: "IN_PROGRESS",
+      startedAt: new Date(),
+      progress: 10,
+    }
+  });
+
+  await prisma.activityLog.create({
+    data: {
+      action: "STATUS_UPDATED",
+      entityType: "TASK",
+      entityId: taskId,
+      userId: session.user.id,
+      details: "Started task"
+    }
+  });
+
+  revalidatePath("/dashboard/tasks");
+  revalidatePath(`/dashboard/tasks/${taskId}`);
+}
+
+export async function completeTaskAction(taskId: string) {
+  const session = await getSession();
+  if (!session) return { error: "Unauthorized" };
+
+  await prisma.task.update({
+    where: { id: taskId },
+    data: {
+      status: "COMPLETED",
+      completedAt: new Date(),
+      progress: 100,
+    }
+  });
+
+  await prisma.activityLog.create({
+    data: {
+      action: "STATUS_UPDATED",
+      entityType: "TASK",
+      entityId: taskId,
+      userId: session.user.id,
+      details: "Completed task"
+    }
+  });
+
+  revalidatePath("/dashboard/tasks");
+  revalidatePath(`/dashboard/tasks/${taskId}`);
+}
+
+export async function requestTimeExtensionAction(taskId: string, formData: FormData) {
+  const session = await getSession();
+  if (!session) return { error: "Unauthorized" };
+
+  const hours = parseInt(formData.get("hours") as string, 10);
+  const reason = formData.get("reason") as string;
+
+  if (!hours || !reason) return { error: "Hours and reason are required" };
+
+  await prisma.task.update({
+    where: { id: taskId },
+    data: {
+      status: "TIME_EXTENSION_REQUESTED",
+      extensionRequestedHours: hours,
+      extensionReason: reason,
+    }
+  });
+
+  await prisma.activityLog.create({
+    data: {
+      action: "EXTENSION_REQUESTED",
+      entityType: "TASK",
+      entityId: taskId,
+      userId: session.user.id,
+      details: `Requested ${hours} extra hours. Reason: ${reason}`
+    }
+  });
+
+  revalidatePath("/dashboard/tasks");
+  revalidatePath(`/dashboard/tasks/${taskId}`);
+}
+
+export async function approveTimeExtensionAction(taskId: string) {
+  const session = await getSession();
+  if (session?.user?.role !== "ADMIN") return { error: "Unauthorized" };
+
+  const task = await prisma.task.findUnique({ where: { id: taskId } });
+  if (!task || !task.extensionRequestedHours) return { error: "No extension requested" };
+
+  const newAllottedHours = (task.allottedHours || 0) + task.extensionRequestedHours;
+
+  await prisma.task.update({
+    where: { id: taskId },
+    data: {
+      status: "IN_PROGRESS",
+      allottedHours: newAllottedHours,
+      extensionRequestedHours: null,
+      extensionReason: null,
+    }
+  });
+
+  await prisma.activityLog.create({
+    data: {
+      action: "EXTENSION_APPROVED",
+      entityType: "TASK",
+      entityId: taskId,
+      userId: session.user.id,
+      details: `Approved ${task.extensionRequestedHours} extra hours`
+    }
+  });
+
+  revalidatePath("/dashboard/tasks");
+  revalidatePath(`/dashboard/tasks/${taskId}`);
 }
 
 export async function updateTaskStatusAction(id: string, formData: FormData) {

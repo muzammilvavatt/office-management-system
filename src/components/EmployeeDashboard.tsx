@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FolderKanban, CheckSquare, Clock, AlertCircle } from "lucide-react";
 import { AttendanceTracker } from "@/components/AttendanceTracker";
 import { DailyChecklist } from "@/components/DailyChecklist";
+import { EmployeeTaskActions } from "@/components/EmployeeTaskActions";
 import Link from "next/link";
 import { Button } from "./ui/button";
 
@@ -112,18 +113,21 @@ export function EmployeeDashboard({
                             </span>
                           </div>
                           <h4 className="font-semibold text-slate-900">{task.name}</h4>
-                          {task.deadline && (
-                            <div className="flex items-center text-xs text-slate-500 mt-1">
+                          {task.allottedHours && (
+                            <div className="flex items-center text-xs text-slate-600 mt-1">
                               <Clock className="w-3 h-3 mr-1" />
-                              Deadline: {new Date(task.deadline).toLocaleDateString()}
+                              Allotted Time: <span className="font-semibold ml-1">{task.allottedHours} hours</span>
                             </div>
                           )}
                         </div>
-                        <Link href={`/dashboard/tasks/${task.id}`}>
-                          <Button variant="outline" size="sm" className="w-full sm:w-auto text-blue-700 border-blue-200 hover:bg-blue-50">
-                            View Details
-                          </Button>
-                        </Link>
+                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto mt-3 sm:mt-0 items-end sm:items-center">
+                          <Link href={`/dashboard/tasks/${task.id}`}>
+                            <Button variant="outline" size="sm" className="w-full sm:w-auto text-slate-700 border-slate-300">
+                              Details
+                            </Button>
+                          </Link>
+                          <EmployeeTaskActions taskId={task.id} status={task.status} allottedHours={task.allottedHours} />
+                        </div>
                       </div>
                     );
                   })

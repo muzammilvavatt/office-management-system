@@ -59,6 +59,13 @@ model Task {
   deadline    DateTime?
   notes       String?
 
+  // Time Tracking & Delegation
+  allottedHours            Int?
+  startedAt                DateTime?
+  completedAt              DateTime?
+  extensionRequestedHours  Int?
+  extensionReason          String?
+
   projectId   String
   project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
 

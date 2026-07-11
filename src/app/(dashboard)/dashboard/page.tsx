@@ -16,25 +16,33 @@ export default async function DashboardPage() {
   // --- ADMIN DATA FETCHING ---
   let adminData = null;
   if (isAdmin) {
-    const employeeCount = await prisma.user.count();
-    const projectCount = await prisma.project.count();
-    const taskCount = await prisma.task.count();
-    const pendingTaskCount = await prisma.task.count({ where: { status: "PENDING" } });
-
-    const inProgressCount = await prisma.task.count({ where: { status: "IN_PROGRESS" } });
-    const doneCount = await prisma.task.count({ where: { status: "COMPLETED" } });
+    const [
+      employeeCount,
+      projectCount,
+      taskCount,
+      pendingTaskCount,
+      inProgressCount,
+      doneCount,
+      usersWithTasks
+    ] = await Promise.all([
+      prisma.user.count(),
+      prisma.project.count(),
+      prisma.task.count(),
+      prisma.task.count({ where: { status: "PENDING" } }),
+      prisma.task.count({ where: { status: "IN_PROGRESS" } }),
+      prisma.task.count({ where: { status: "COMPLETED" } }),
+      prisma.user.findMany({
+        include: { _count: { select: { assignedTasks: true } } },
+        take: 10,
+        orderBy: { assignedTasks: { _count: 'desc' } }
+      })
+    ]);
 
     const taskDistributionData = [
       { name: 'To Do', value: pendingTaskCount, color: '#94a3b8' },
       { name: 'In Progress', value: inProgressCount, color: '#3b82f6' },
       { name: 'Done', value: doneCount, color: '#22c55e' },
     ];
-
-    const usersWithTasks = await prisma.user.findMany({
-      include: { _count: { select: { assignedTasks: true } } },
-      take: 10,
-      orderBy: { assignedTasks: { _count: 'desc' } }
-    });
 
     const employeeWorkloadData = usersWithTasks.map(u => ({
       name: u.name.split(' ')[0],
@@ -47,23 +55,43 @@ export default async function DashboardPage() {
   // --- EMPLOYEE DATA FETCHING ---
   let employeeData = null;
   if (!isAdmin) {
-    const dbUser = await prisma.user.findUnique({ where: { id: session.user.id } });
-    
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
-    
-    const todayRecord = await prisma.attendance.findFirst({
-      where: { userId: session.user.id, date: { gte: todayStart } }
-    });
 
-    const userResp = await prisma.userDailyResponsibility.findMany({
-      where: { userId: session.user.id },
-      include: { dailyResponsibility: true }
-    });
-
-    const todaysLogs = await prisma.dailyTaskLog.findMany({
-      where: { userId: session.user.id, date: todayStart }
-    });
+    const [
+      dbUser,
+      todayRecord,
+      userResp,
+      todaysLogs,
+      myProjectTasks
+    ] = await Promise.all([
+      prisma.user.findUnique({ where: { id: session.user.id } }),
+      prisma.attendance.findFirst({
+        where: { userId: session.user.id, date: { gte: todayStart } }
+      }),
+      prisma.userDailyResponsibility.findMany({
+        where: { userId: session.user.id },
+        include: { dailyResponsibility: true }
+      }),
+      prisma.dailyTaskLog.findMany({
+        where: { userId: session.user.id, date: todayStart }
+      }),
+      prisma.taskAssignee.findMany({
+        where: { 
+          userId: session.user.id, 
+          task: { status: { not: "COMPLETED" } } 
+        },
+        include: {
+          task: {
+            include: { project: true }
+          }
+        },
+        orderBy: [
+          { task: { priority: 'desc' } }, 
+          { task: { deadline: 'asc' } }
+        ]
+      })
+    ]);
 
     const dailyChecklistData = userResp.map(ur => {
       const log = todaysLogs.find(l => l.dailyResponsibilityId === ur.dailyResponsibilityId);
@@ -73,23 +101,6 @@ export default async function DashboardPage() {
         description: ur.dailyResponsibility.description,
         status: log?.status || "PENDING",
       };
-    });
-
-    // Fetch employee's project tasks
-    const myProjectTasks = await prisma.taskAssignee.findMany({
-      where: { 
-        userId: session.user.id, 
-        task: { status: { not: "COMPLETED" } } 
-      },
-      include: {
-        task: {
-          include: { project: true }
-        }
-      },
-      orderBy: [
-        { task: { priority: 'desc' } }, // Note: assuming priority is an enum, simple string sorting won't work perfectly if enums aren't ordered, but it works for now.
-        { task: { deadline: 'asc' } }
-      ]
     });
 
     // Calculate total hours today

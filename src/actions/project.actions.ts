@@ -36,69 +36,29 @@ export async function createProjectAction(prevState: any, formData: FormData) {
     deadline = new Date(deadlineStr);
   }
 
-  // 1. Fetch all master Project Roles
-  const allRoles = await prisma.projectRole.findMany();
-
-  // 2. We will map each role to a task. We also try to find ONE user who has this role to assign as a default.
-  //    To do this efficiently, we can fetch all UserProjectRoles.
-  const userRoles = await prisma.userProjectRole.findMany({
-    include: {
-      user: true
-    }
-  });
-
   try {
-    // 3. Create the project and its auto-generated tasks inside a single transaction
-    await prisma.$transaction(async (tx) => {
-      const project = await tx.project.create({
-        data: {
-          name,
-          clientName,
-          clientPhone,
-          clientEmail,
-          location,
-          description,
-          deadline,
-          status: "ACTIVE",
-          priority: "MEDIUM",
-        },
-      });
-
-      // 4. Generate a task for each ProjectRole
-      for (const role of allRoles) {
-        // Find users that have this role assigned
-        const eligibleUsers = userRoles.filter(ur => ur.projectRoleId === role.id && ur.user.isActive);
-        
-        // Pick a default assignee (just pick the first one, or leave unassigned if none)
-        const defaultAssigneeId = eligibleUsers.length > 0 ? eligibleUsers[0].userId : null;
-
-        const taskData: any = {
-          name: role.name,
-          category: "OTHER", // we can leave this generic or map it based on role name
-          status: "PENDING",
-          priority: "MEDIUM",
-          projectId: project.id,
-        };
-
-        if (defaultAssigneeId) {
-          taskData.assignees = {
-            create: [{ userId: defaultAssigneeId }]
-          };
-        }
-
-        await tx.task.create({
-          data: taskData
-        });
-      }
+    const project = await prisma.project.create({
+      data: {
+        name,
+        clientName,
+        clientPhone,
+        clientEmail,
+        location,
+        description,
+        deadline,
+        status: "ACTIVE",
+        priority: "MEDIUM",
+      },
     });
 
+
   } catch (error: any) {
-    console.error("Failed to create project with auto-generated roles:", error);
-    return { error: "Failed to create project and generate tasks." };
+    console.error("Failed to create project:", error);
+    return { error: "Failed to create project." };
   }
 
   revalidatePath("/dashboard/projects");
-  redirect("/dashboard/projects");
+  return { success: true };
 }
 
 export async function updateProjectStatusAction(id: string, newStatus: string) {

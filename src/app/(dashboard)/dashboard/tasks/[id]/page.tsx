@@ -88,7 +88,44 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
                 </div>
               </div>
 
-              <div>
+              <div className="grid grid-cols-2 gap-4 text-sm mt-4">
+                <div>
+                  <span className="text-slate-500 font-medium block">Allotted Time</span>
+                  <span className="font-semibold">{task.allottedHours ? `${task.allottedHours} hours` : "Not set"}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium block">Time Started</span>
+                  <span className="font-semibold">
+                    {task.startedAt ? new Date(task.startedAt).toLocaleString() : "Not started"}
+                  </span>
+                </div>
+              </div>
+
+              {task.status === "TIME_EXTENSION_REQUESTED" && (
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3 mt-4">
+                  <div className="flex items-center text-amber-800 font-bold">
+                    <Clock className="w-4 h-4 mr-2" />
+                    Time Extension Requested
+                  </div>
+                  <div className="text-sm text-amber-900">
+                    <p><strong>Requested Extra Hours:</strong> {task.extensionRequestedHours} hours</p>
+                    <p><strong>Reason:</strong> {task.extensionReason}</p>
+                  </div>
+                  {isAdmin && (
+                    <form action={async () => {
+                      "use server";
+                      const { approveTimeExtensionAction } = await import("@/actions/task.actions");
+                      await approveTimeExtensionAction(task.id);
+                    }}>
+                      <Button type="submit" className="bg-amber-600 hover:bg-amber-700 text-white w-full sm:w-auto">
+                        Approve {task.extensionRequestedHours} Extra Hours
+                      </Button>
+                    </form>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-4">
                 <span className="text-slate-700 font-medium block text-sm mb-2">Notes & Instructions</span>
                 <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 whitespace-pre-wrap text-sm text-slate-700 min-h-[100px]">
                   {task.notes || "No additional notes provided."}

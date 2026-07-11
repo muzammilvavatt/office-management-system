@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { createProjectAction } from "@/actions/project.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,13 +8,27 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Building2, Plus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function AddProjectForm() {
   const [state, formAction, isPending] = useActionState(createProjectAction, undefined);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state?.success) {
+      router.push("/dashboard/projects");
+      router.refresh();
+    }
+  }, [state, router]);
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto pb-10">
       <form action={formAction}>
+        {state?.error && (
+          <div className="mb-6 p-3 text-sm text-red-700 bg-red-50 rounded-md border border-red-200">
+            {state.error}
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="name" className="text-slate-700 font-medium">Project Name *</Label>

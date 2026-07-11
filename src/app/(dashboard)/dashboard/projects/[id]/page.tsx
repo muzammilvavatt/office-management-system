@@ -2,8 +2,9 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, FolderKanban, MapPin, Phone, Mail } from "lucide-react";
+import { ArrowLeft, FolderKanban, MapPin, Phone, Mail, FileText, Download } from "lucide-react";
 import { notFound } from "next/navigation";
+import { FileUpload } from "@/components/FileUpload";
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -12,6 +13,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     include: {
       tasks: {
         include: { assignees: { include: { user: true } } }
+      },
+      files: {
+        include: { uploader: true }
       }
     }
   });
@@ -113,6 +117,44 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                         </div>
                       </div>
                     </Link>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Project Files */}
+          <Card className="bg-white border-slate-200 text-slate-900 shadow-sm rounded-xl">
+            <CardHeader className="border-b border-slate-100 pb-4">
+              <CardTitle className="flex items-center text-lg font-bold">
+                <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                Project Files
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-6">
+              <FileUpload projectId={project.id} />
+              
+              <div className="space-y-3 mt-6">
+                <h3 className="text-sm font-semibold text-slate-500 uppercase">Uploaded Files</h3>
+                {project.files.length === 0 ? (
+                  <p className="text-sm text-slate-500 text-center py-4 border border-dashed border-slate-200 rounded-lg bg-slate-50">No files uploaded yet.</p>
+                ) : (
+                  project.files.map(file => (
+                    <div key={file.id} className="flex items-center justify-between p-3 bg-white border border-slate-200 shadow-sm rounded-lg hover:border-blue-300 transition-colors">
+                      <div className="flex-1 min-w-0 pr-2">
+                        <p className="text-sm font-semibold text-slate-800 truncate" title={file.name}>
+                          {file.name}
+                        </p>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">
+                          {Math.round(file.size / 1024)} KB • By {file.uploader.name.split(" ")[0]}
+                        </p>
+                      </div>
+                      <a href={file.url} target="_blank" rel="noopener noreferrer" download>
+                        <Button size="icon" variant="ghost" className="hover:bg-blue-50 text-blue-600">
+                          <Download className="w-4 h-4" />
+                        </Button>
+                      </a>
+                    </div>
                   ))
                 )}
               </div>
