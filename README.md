@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Office Management System
 
-## Getting Started
+A robust, full-stack web application designed to streamline internal operations, track employee attendance with geofencing, manage projects, and optimize task delegation.
 
-First, run the development server:
+Built with modern web technologies, this system provides a secure, fast, and intuitive experience for both Administrators and Employees.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **📍 Geofenced Attendance Tracking:** Strictly enforce office premises for clock-ins using the browser's Geolocation API. (Includes an `isWFH` bypass for remote workers).
+- **⏱️ Precision Task Time Tracking:** Employees can start and pause task timers. The system tracks time spent down to the minute.
+- **📈 Task Delegation & Workflow:** Admins can assign tasks to employees with specific allotted times. Employees can request time extensions directly through the portal.
+- **🔔 Real-Time Notification Hub:** Two-way notification system. Employees are notified of new tasks and extension approvals. Admins are notified of task completions and extension requests.
+- **📁 Secure File Management:** Upload, preview, and download project files directly to Supabase storage.
+- **👥 Role-Based Access Control:** Distinct Admin and Employee views. Admins have full oversight over projects, tasks, and team management.
+- **📊 Activity Logging:** Detailed audit trails for every action taken within the system.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Technology Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework:** [Next.js 14](https://nextjs.org/) (App Router)
+- **Database:** PostgreSQL (Hosted on [Supabase](https://supabase.com/))
+- **ORM:** [Prisma](https://www.prisma.io/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Components:** [shadcn/ui](https://ui.shadcn.com/) (Radix UI)
+- **Authentication:** Custom session-based auth with `bcryptjs`
+- **Deployment:** [Vercel](https://vercel.com/) (Sydney Region for optimal latency)
 
-## Learn More
+## 🚀 Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+### Prerequisites
+- Node.js 18+
+- A Supabase account and PostgreSQL database url.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/muzammilvavatt/office-management-system.git
+   cd office-management-system
+   ```
 
-## Deploy on Vercel
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Environment Setup**
+   Create a `.env` file in the root directory and add your Supabase connection strings:
+   ```env
+   DATABASE_URL="postgresql://postgres.[YOUR_PROJECT_ID]:[YOUR_PASSWORD]@aws-0-ap-southeast-2.pooler.supabase.com:5432/postgres?pgbouncer=true&connection_limit=1"
+   DIRECT_URL="postgresql://postgres.[YOUR_PROJECT_ID]:[YOUR_PASSWORD]@aws-0-ap-southeast-2.pooler.supabase.com:5432/postgres"
+   
+   NEXT_PUBLIC_SUPABASE_URL="https://[YOUR_PROJECT_ID].supabase.co"
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+   SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Initialize the Database**
+   ```bash
+   npx prisma db push
+   ```
+
+5. **Run the Development Server**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) with your browser.
+
+## 🔐 Default Accounts
+
+*(If a seed script was run, otherwise register a new account and manually upgrade the role in the database)*
+- **Admin:** `admin@example.com` | `password`
+- **Employee:** `employee@example.com` | `password`
+
+## 🌍 Localization
+
+This application is strictly localized for **India Standard Time (IST)**. All timestamps, activity feeds, and attendance records are formatted using the `en-IN` locale and `Asia/Kolkata` timezone to prevent serverless UTC drift.
+
+---
+*Developed for efficient office management.*
