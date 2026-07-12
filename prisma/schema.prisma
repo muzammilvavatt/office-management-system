@@ -13,6 +13,7 @@ model User {
   email         String         @unique
   passwordHash  String
   name          String
+  phoneNumber   String?
   role          String         @default("EMPLOYEE") // ADMIN, EMPLOYEE
   isWFH         Boolean        @default(false)
   isActive      Boolean        @default(true)

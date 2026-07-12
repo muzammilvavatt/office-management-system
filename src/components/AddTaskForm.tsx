@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import Link from "next/link";
 
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 const TASK_CATEGORIES = [
   "SITE_INSPECTION",
   "SITE_PLAN",
@@ -22,6 +25,16 @@ const TASK_CATEGORIES = [
 
 export function AddTaskForm({ projects, employees, tasks = [] }: { projects: any[], employees: any[], tasks?: any[] }) {
   const [state, formAction, isPending] = useActionState(createTaskAction, undefined);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state?.success) {
+      if (state.whatsappUrl) {
+        window.open(state.whatsappUrl, '_blank');
+      }
+      router.push("/dashboard/tasks");
+    }
+  }, [state, router]);
 
   return (
     <form action={formAction}>

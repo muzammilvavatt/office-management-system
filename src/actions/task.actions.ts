@@ -67,15 +67,24 @@ export async function createTaskAction(prevState: any, formData: FormData) {
       }
     });
 
+    const assignee = await prisma.user.findUnique({ where: { id: assigneeId } });
+
+    let whatsappUrl = null;
+    if (assignee && assignee.phoneNumber) {
+      const text = `🔔 *New Task Assigned*\n\n*Task:* ${name}\n*Priority:* ${priority || "MEDIUM"}\n*Deadline:* ${deadlineStr ? new Date(deadlineStr).toLocaleDateString() : 'None'}\n\nPlease check your dashboard.`;
+      const cleanPhone = assignee.phoneNumber.replace(/[^0-9]/g, '');
+      whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+    }
+
+    revalidatePath("/dashboard/tasks");
+    revalidatePath(`/dashboard/projects/${projectId}`);
+    revalidatePath("/dashboard");
+
+    return { success: true, whatsappUrl };
   } catch (error) {
     console.error(error);
     return { error: "Failed to create task" };
   }
-
-  revalidatePath("/dashboard/tasks");
-  revalidatePath(`/dashboard/projects/${projectId}`);
-  revalidatePath("/dashboard");
-  redirect("/dashboard/tasks");
 }
 
 export async function startTaskAction(taskId: string) {

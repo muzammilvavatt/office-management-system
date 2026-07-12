@@ -21,6 +21,7 @@ export async function createEmployeeAction(prevState: any, formData: FormData) {
   }
 
   const name = formData.get("name") as string;
+  const phoneNumber = formData.get("phoneNumber") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const role = formData.get("role") as string;
@@ -45,6 +46,7 @@ export async function createEmployeeAction(prevState: any, formData: FormData) {
     await prisma.user.create({
       data: {
         name,
+        phoneNumber: phoneNumber || null,
         email,
         passwordHash,
         role,
