@@ -189,11 +189,22 @@ export function TaskList({ initialTasks, activeTab, isAdmin }: { initialTasks: T
                       </div>
                     )}
                     {activeTab === "completed" && (
-                      <Link href={`/dashboard/tasks/${task.id}`}>
-                        <Button size="sm" variant="ghost" className="h-7 text-xs font-medium text-blue-600 hover:bg-blue-50">
-                          View
+                      <div className="flex space-x-1">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="h-7 text-xs font-medium border-amber-200 text-amber-700 hover:bg-amber-50"
+                          onClick={() => handleStatusChange(task.id, "IN_PROGRESS")}
+                          disabled={isPending}
+                        >
+                          Reopen
                         </Button>
-                      </Link>
+                        <Link href={`/dashboard/tasks/${task.id}`}>
+                          <Button size="sm" variant="ghost" className="h-7 text-xs font-medium text-blue-600 hover:bg-blue-50">
+                            View
+                          </Button>
+                        </Link>
+                      </div>
                     )}
                   </div>
 
