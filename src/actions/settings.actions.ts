@@ -136,3 +136,27 @@ export async function updateProfilePictureAction(url: string) {
   revalidatePath("/dashboard/settings");
   return { success: true };
 }
+
+export async function updatePersonalInfoAction(prevState: any, formData: FormData) {
+  const session = await getSession();
+  if (!session?.user?.id) return { error: "Unauthorized" };
+  
+  const name = formData.get("name")?.toString();
+  const phoneNumber = formData.get("phoneNumber")?.toString();
+
+  if (!name) return { error: "Name is required" };
+
+  try {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { 
+        name,
+        phoneNumber: phoneNumber || null
+      }
+    });
+    revalidatePath("/dashboard/settings");
+    return { success: "Personal information updated successfully!" };
+  } catch (err: any) {
+    return { error: "Failed to update personal information" };
+  }
+}

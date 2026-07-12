@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
-import { ChangePasswordForm, ProfilePictureForm, AdminGlobalSettingsForm } from "@/components/SettingsForms";
+import { ChangePasswordForm, ProfilePictureForm, AdminGlobalSettingsForm, PersonalInfoForm } from "@/components/SettingsForms";
 
 export default async function SettingsPage() {
   const session = await getSession();
@@ -31,13 +31,14 @@ export default async function SettingsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-6 md:col-span-1">
+          <PersonalInfoForm user={user} />
           {user.role === "EMPLOYEE" && (
             <ProfilePictureForm user={user} />
           )}
-          <ChangePasswordForm />
         </div>
         
         <div className="space-y-6 md:col-span-1">
+          <ChangePasswordForm />
           {user.role === "ADMIN" && (
             <AdminGlobalSettingsForm initialRequireSelfie={globalSetting?.requireSelfieVerification ?? true} />
           )}

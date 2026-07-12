@@ -6,9 +6,10 @@ import { Lock, Settings as SettingsIcon, Image as ImageIcon, UploadCloud, CheckC
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { changePasswordAction, updateGlobalSettingsAction, updateProfilePictureAction } from "@/actions/settings.actions";
+import { changePasswordAction, updateGlobalSettingsAction, updateProfilePictureAction, updatePersonalInfoAction } from "@/actions/settings.actions";
 import { uploadFileToServerAction } from "@/actions/upload.actions";
 import { useTransition } from "react";
+import { User } from "lucide-react";
 
 export function ChangePasswordForm() {
   const [state, formAction, isPending] = useActionState(changePasswordAction, undefined);
@@ -219,6 +220,83 @@ export function AdminGlobalSettingsForm({ initialRequireSelfie }: { initialRequi
           </label>
         </div>
       </CardContent>
+    </Card>
+  );
+}
+
+export function PersonalInfoForm({ user }: { user: any }) {
+  const [state, formAction, isPending] = useActionState(updatePersonalInfoAction, undefined);
+
+  return (
+    <Card className="bg-white border-slate-200 text-slate-900 shadow-sm rounded-xl">
+      <CardHeader className="border-b border-slate-100 pb-4">
+        <CardTitle className="flex items-center text-lg font-bold">
+          <User className="w-5 h-5 mr-2 text-indigo-600" />
+          Personal Information
+        </CardTitle>
+        <CardDescription className="text-slate-500">
+          Update your contact details and basic information.
+        </CardDescription>
+      </CardHeader>
+      <form action={formAction}>
+        <CardContent className="pt-6 space-y-4">
+          {state?.error && (
+            <div className="p-3 text-sm text-rose-700 bg-rose-50 rounded-md border border-rose-200 font-medium">
+              {state.error}
+            </div>
+          )}
+          {state?.success && (
+            <div className="p-3 text-sm text-emerald-700 bg-emerald-50 rounded-md border border-emerald-200 font-medium">
+              {state.success}
+            </div>
+          )}
+          
+          <div className="space-y-2">
+            <Label htmlFor="email">Email Address</Label>
+            <Input
+              id="email"
+              type="email"
+              defaultValue={user.email}
+              disabled
+              className="bg-slate-50 text-slate-500 cursor-not-allowed"
+            />
+            <p className="text-xs text-slate-400">Email cannot be changed.</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="name">Full Name</Label>
+            <Input
+              id="name"
+              name="name"
+              type="text"
+              defaultValue={user.name}
+              required
+              className="bg-white"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="phoneNumber">Phone Number</Label>
+            <Input
+              id="phoneNumber"
+              name="phoneNumber"
+              type="tel"
+              defaultValue={user.phoneNumber || ""}
+              placeholder="+1 (555) 000-0000"
+              className="bg-white"
+            />
+          </div>
+        </CardContent>
+        <CardFooter className="pb-6">
+          <Button 
+            type="submit" 
+            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm rounded-xl"
+            disabled={isPending}
+          >
+            {isPending ? "Saving..." : "Save Changes"}
+          </Button>
+        </CardFooter>
+      </form>
     </Card>
   );
 }
