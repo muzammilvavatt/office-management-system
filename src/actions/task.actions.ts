@@ -145,8 +145,56 @@ export async function completeTaskAction(taskId: string) {
     await prisma.notification.create({
       data: {
         userId: admin.id,
+        message: `Task "${task.name}" was marked as completed by an employee.`,
         type: "TASK_COMPLETED",
-        message: `${session.user.name || 'An employee'} completed task: ${task.name}`,
+      }
+    });
+  }
+
+  revalidatePath("/dashboard/tasks");
+  revalidatePath(`/dashboard/tasks/${taskId}`);
+}
+
+export async function submitForReviewAction(taskId: string) {
+  const session = await getSession();
+  if (!session) return { error: "Unauthorized" };
+
+  const task = await prisma.task.findUnique({ where: { id: taskId } });
+  if (!task) return { error: "Task not found" };
+
+  const now = new Date();
+  let addMs = 0;
+  if (task.lastTimerStart) {
+    addMs = now.getTime() - new Date(task.lastTimerStart).getTime();
+  }
+
+  await prisma.task.update({
+    where: { id: taskId },
+    data: {
+      status: "REVIEW",
+      timeSpentMs: task.timeSpentMs + addMs,
+      lastTimerStart: null,
+      progress: 90,
+    }
+  });
+
+  await prisma.activityLog.create({
+    data: {
+      action: "STATUS_UPDATED",
+      entityType: "TASK",
+      entityId: taskId,
+      userId: session.user.id,
+      details: "Submitted for review"
+    }
+  });
+
+  const admins = await prisma.user.findMany({ where: { role: 'ADMIN' } });
+  for (const admin of admins) {
+    await prisma.notification.create({
+      data: {
+        userId: admin.id,
+        message: `Task "${task.name}" has been submitted for review.`,
+        type: "TASK_COMPLETED",
       }
     });
   }

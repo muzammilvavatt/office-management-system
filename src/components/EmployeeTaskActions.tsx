@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { startTaskAction, completeTaskAction, requestTimeExtensionAction } from "@/actions/task.actions";
+import { startTaskAction, submitForReviewAction, requestTimeExtensionAction } from "@/actions/task.actions";
 import { Play, Check, Clock, Loader2 } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 
@@ -60,6 +60,10 @@ export function EmployeeTaskActions({ taskId, status, allottedHours, timeSpentMs
     return <span className="text-sm font-bold text-green-600 flex items-center"><Check className="w-4 h-4 mr-1"/> Completed</span>;
   }
 
+  if (status === "REVIEW") {
+    return <span className="text-sm font-bold text-purple-600 flex items-center"><Check className="w-4 h-4 mr-1"/> Pending Review</span>;
+  }
+
   if (status === "TIME_EXTENSION_REQUESTED") {
     return <span className="text-sm font-medium text-amber-600">Extension Pending...</span>;
   }
@@ -72,10 +76,10 @@ export function EmployeeTaskActions({ taskId, status, allottedHours, timeSpentMs
     });
   };
 
-  const handleCompleteTask = () => {
-    setActiveAction("COMPLETE");
+  const handleSubmitReview = () => {
+    setActiveAction("REVIEW");
     startTransition(async () => {
-      await completeTaskAction(taskId);
+      await submitForReviewAction(taskId);
       setActiveAction(null);
     });
   };
@@ -113,13 +117,13 @@ export function EmployeeTaskActions({ taskId, status, allottedHours, timeSpentMs
         <>
           {allottedHours !== null && <TaskTimer timeSpentMs={timeSpentMs} lastTimerStart={lastTimerStart ?? null} allottedHours={allottedHours} />}
           <Button 
-            onClick={handleCompleteTask} 
+            onClick={handleSubmitReview} 
             disabled={isPending || !isClockedIn} 
             size="sm" 
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
           >
-            {isPending && activeAction === "COMPLETE" ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
-            {isPending && activeAction === "COMPLETE" ? "Completing..." : "Complete Task"}
+            {isPending && activeAction === "REVIEW" ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
+            {isPending && activeAction === "REVIEW" ? "Submitting..." : "Submit for Review"}
           </Button>
 
           {!isRequesting ? (

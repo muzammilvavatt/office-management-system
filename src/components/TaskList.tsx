@@ -2,8 +2,8 @@
 
 import React, { useTransition } from "react";
 import Link from "next/link";
-import { updateTaskStatusDragAction } from "@/actions/task.actions";
-import { Clock, Lock, CheckCircle2, Circle, AlertCircle, Clock3 } from "lucide-react";
+import { updateTaskStatusDragAction, submitForReviewAction } from "@/actions/task.actions";
+import { Clock, Lock, CheckCircle2, Circle, AlertCircle, Clock3, Search } from "lucide-react";
 import { Button } from "./ui/button";
 
 type Assignee = {
@@ -37,7 +37,11 @@ export function TaskList({ initialTasks, activeTab, isAdmin }: { initialTasks: T
 
   const handleStatusChange = (taskId: string, newStatus: string) => {
     startTransition(async () => {
-      await updateTaskStatusDragAction(taskId, newStatus);
+      if (newStatus === "REVIEW") {
+        await submitForReviewAction(taskId);
+      } else {
+        await updateTaskStatusDragAction(taskId, newStatus);
+      }
     });
   };
 
@@ -177,14 +181,52 @@ export function TaskList({ initialTasks, activeTab, isAdmin }: { initialTasks: T
                           </Button>
                         )}
                         {(task.status === "IN_PROGRESS" || task.status === "TIME_EXTENSION_REQUESTED") && (
-                          <Button 
-                            size="sm" 
-                            className="h-7 text-xs font-medium bg-green-600 hover:bg-green-700 text-white"
-                            onClick={() => handleStatusChange(task.id, "COMPLETED")}
-                            disabled={isPending}
-                          >
-                            Complete
-                          </Button>
+                          isAdmin ? (
+                            <Button 
+                              size="sm" 
+                              className="h-7 text-xs font-medium bg-green-600 hover:bg-green-700 text-white"
+                              onClick={() => handleStatusChange(task.id, "COMPLETED")}
+                              disabled={isPending}
+                            >
+                              Complete
+                            </Button>
+                          ) : (
+                            <Button 
+                              size="sm" 
+                              className="h-7 text-xs font-medium bg-purple-600 hover:bg-purple-700 text-white"
+                              onClick={() => handleStatusChange(task.id, "REVIEW")}
+                              disabled={isPending}
+                            >
+                              Submit for Review
+                            </Button>
+                          )
+                        )}
+                        {task.status === "REVIEW" && (
+                          isAdmin ? (
+                            <>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="h-7 text-xs font-medium border-red-200 text-red-700 hover:bg-red-50"
+                                onClick={() => handleStatusChange(task.id, "IN_PROGRESS")}
+                                disabled={isPending}
+                              >
+                                Reject
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                className="h-7 text-xs font-medium bg-green-600 hover:bg-green-700 text-white"
+                                onClick={() => handleStatusChange(task.id, "COMPLETED")}
+                                disabled={isPending}
+                              >
+                                Approve
+                              </Button>
+                            </>
+                          ) : (
+                            <span className="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded border border-purple-200">
+                              Pending Review
+                            </span>
+                          )
                         )}
                       </div>
                     )}
