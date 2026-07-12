@@ -31,7 +31,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         <header className="h-16 flex items-center justify-between px-4 pl-16 md:pl-6 md:px-6 bg-white border-b border-slate-200 shadow-sm relative z-10 shrink-0 no-print">
           <div>
             <h1 className="text-base font-semibold text-slate-800 leading-tight">Workspace</h1>
-            <p className="text-xs text-slate-400 font-medium">PROTIME Construction Management</p>
+            <p className="text-xs text-slate-400 font-medium">PROTIME</p>
           </div>
           <div className="flex items-center gap-3">
             <NotificationBell />

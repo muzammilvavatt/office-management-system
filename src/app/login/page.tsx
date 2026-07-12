@@ -26,34 +26,33 @@ export default function LoginPage() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg">
             <span className="text-white text-base font-black">P</span>
           </div>
-          <span className="text-white text-2xl font-bold tracking-tight">PROTIME</span>
+          <div>
+            <span className="text-white text-2xl font-bold tracking-tight">PROTIME</span>
+            <p className="text-indigo-300 text-xs font-medium tracking-wide">Office Management</p>
+          </div>
         </div>
 
         {/* Center content */}
         <div className="relative z-10 space-y-8">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/30 rounded-full">
-              <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse" />
-              <span className="text-indigo-300 text-xs font-semibold uppercase tracking-wider">Enterprise Platform</span>
-            </div>
             <h2 className="text-4xl font-bold text-white leading-tight tracking-tight">
-              Engineered for<br />
+              Your team.<br />
               <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
-                Construction Excellence.
+                All in one place.
               </span>
             </h2>
             <p className="text-slate-400 text-base leading-relaxed max-w-sm">
-              Manage your construction projects, track attendance, and coordinate your team — all from one professional platform.
+              Manage projects, track attendance, assign tasks, and coordinate your team — the internal management system built for PROTIME.
             </p>
           </div>
 
           {/* Feature highlights */}
           <div className="space-y-3">
             {[
-              "Real-time project & task tracking",
-              "GPS-based attendance management",
-              "Automated WhatsApp notifications",
-              "Comprehensive reporting & analytics",
+              "Project & task tracking",
+              "Daily attendance & clock-in",
+              "Team coordination & reports",
+              "WhatsApp task notifications",
             ].map((feat) => (
               <div key={feat} className="flex items-center gap-3">
                 <div className="w-5 h-5 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center shrink-0">
@@ -67,7 +66,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <div className="relative z-10">
-          <p className="text-slate-600 text-sm">© 2025 PROTIME. All rights reserved.</p>
+          <p className="text-slate-600 text-sm">PROTIME Internal System</p>
         </div>
       </div>
 
@@ -152,7 +151,7 @@ export default function LoginPage() {
           </form>
 
           <p className="text-center text-xs text-slate-400">
-            Secured by PROTIME. Contact your administrator for access.
+            Contact your administrator if you need access.
           </p>
         </div>
       </div>

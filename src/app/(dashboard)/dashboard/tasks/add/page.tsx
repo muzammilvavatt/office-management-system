@@ -23,26 +23,28 @@ export default async function AddTaskPage() {
   });
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto pb-10">
-      <div className="flex items-center space-x-4">
+    <div className="space-y-6 max-w-3xl mx-auto pb-10 animate-fade-in-up">
+      <div className="flex items-center gap-4">
         <Link href="/dashboard/tasks">
-          <Button variant="outline" size="icon" className="bg-white border-slate-200 hover:bg-slate-50 text-slate-700">
+          <Button variant="outline" size="icon" className="bg-white border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl h-9 w-9">
             <ArrowLeft className="w-4 h-4" />
           </Button>
         </Link>
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Assign Task</h2>
-          <p className="text-slate-500">Delegate work to your team members.</p>
+          <p className="text-slate-500 text-sm">Delegate work to your team members.</p>
         </div>
       </div>
 
-      <Card className="bg-white border-slate-200 text-slate-900 shadow-sm rounded-xl">
+      <Card className="bg-white ring-1 ring-slate-200 shadow-sm rounded-xl border-0">
         <CardHeader className="border-b border-slate-100 pb-4">
           <CardTitle className="flex items-center text-lg font-bold">
-            <CheckSquare className="w-5 h-5 mr-2 text-blue-600" />
+            <div className="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center mr-3">
+              <CheckSquare className="w-4 h-4 text-indigo-600" />
+            </div>
             Task Details
           </CardTitle>
-          <CardDescription className="text-slate-500">
+          <CardDescription className="text-slate-500 ml-10">
             Define the scope, priority, and who is responsible.
           </CardDescription>
         </CardHeader>
