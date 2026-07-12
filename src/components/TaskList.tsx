@@ -32,7 +32,7 @@ type Task = {
   assignees: Assignee[];
 };
 
-export function TaskList({ initialTasks, activeTab, isAdmin }: { initialTasks: Task[], activeTab: string, isAdmin: boolean }) {
+export function TaskList({ initialTasks, activeTab, isAdmin, isClockedIn }: { initialTasks: Task[], activeTab: string, isAdmin: boolean, isClockedIn?: boolean }) {
   const [isPending, startTransition] = useTransition();
 
   const handleStatusChange = (taskId: string, newStatus: string) => {
@@ -181,7 +181,8 @@ export function TaskList({ initialTasks, activeTab, isAdmin }: { initialTasks: T
                             variant="outline" 
                             className="h-7 text-xs font-medium border-blue-200 text-blue-700 hover:bg-blue-50"
                             onClick={() => handleStatusChange(task.id, "IN_PROGRESS")}
-                            disabled={isPending}
+                            disabled={isPending || (!isAdmin && !isClockedIn)}
+                            title={!isAdmin && !isClockedIn ? "Please clock in first" : ""}
                           >
                             Start
                           </Button>
@@ -191,7 +192,8 @@ export function TaskList({ initialTasks, activeTab, isAdmin }: { initialTasks: T
                             size="sm" 
                             className="h-7 text-xs font-medium bg-purple-600 hover:bg-purple-700 text-white"
                             onClick={() => handleStatusChange(task.id, "REVIEW")}
-                            disabled={isPending}
+                            disabled={isPending || (!isAdmin && !isClockedIn)}
+                            title={!isAdmin && !isClockedIn ? "Please clock in first" : ""}
                           >
                             Submit for Review
                           </Button>

@@ -13,6 +13,19 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
   const resolvedParams = await searchParams;
   const activeTab = resolvedParams.tab === "completed" ? "completed" : "active";
 
+  let isClockedIn = false;
+  if (!isAdmin && session?.user?.id) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayRecord = await prisma.attendance.findFirst({
+      where: {
+        userId: session.user.id,
+        date: { gte: today },
+      },
+    });
+    isClockedIn = !!(todayRecord && !todayRecord.clockOut);
+  }
+
   // Base status filter based on the active tab
   const statusFilter = activeTab === "completed" 
     ? { status: "COMPLETED" } 
@@ -71,7 +84,13 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
         </Link>
       </div>
 
-      <TaskList initialTasks={tasks} activeTab={activeTab} isAdmin={isAdmin} />
+      {!isAdmin && activeTab === "active" && !isClockedIn && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-lg text-sm font-medium flex items-center">
+          ⚠️ You must clock in from the Dashboard before you can start or submit tasks.
+        </div>
+      )}
+
+      <TaskList initialTasks={tasks} activeTab={activeTab} isAdmin={isAdmin} isClockedIn={isClockedIn} />
     </div>
   );
 }
