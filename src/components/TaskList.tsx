@@ -86,13 +86,19 @@ export function TaskList({ initialTasks, activeTab, isAdmin }: { initialTasks: T
   return (
     <div className="space-y-8 mt-4 pb-12">
       {Object.entries(groupedTasks).map(([projectName, tasks]) => (
-        <div key={projectName} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider">{projectName}</h3>
+        <details key={projectName} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden group mb-6" open>
+          <summary className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center cursor-pointer list-none hover:bg-slate-100 transition-colors">
+            <div className="flex items-center">
+              <svg className="w-4 h-4 text-slate-400 mr-2 group-open:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center">
+                <svg className="w-4 h-4 mr-2 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+                {projectName}
+              </h3>
+            </div>
             <span className="bg-white border border-slate-200 text-slate-500 text-xs font-semibold px-2 py-0.5 rounded-full">
               {tasks.length}
             </span>
-          </div>
+          </summary>
           
           <div className="divide-y divide-slate-100">
             {tasks.map((task) => {
@@ -243,7 +249,7 @@ export function TaskList({ initialTasks, activeTab, isAdmin }: { initialTasks: T
               );
             })}
           </div>
-        </div>
+        </details>
       ))}
     </div>
   );
