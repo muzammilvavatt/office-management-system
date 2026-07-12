@@ -6,6 +6,8 @@ import { deleteProjectAction } from "@/actions/project.actions";
 import { getSession } from "@/lib/session";
 import { DeleteButton } from "@/components/DeleteButton";
 
+import { GlobalProjectsReportButtons } from "@/components/GlobalProjectsReportButtons";
+
 export default async function ProjectsPage() {
   const session = await getSession();
   const isAdmin = session?.user?.role === "ADMIN";
@@ -13,6 +15,9 @@ export default async function ProjectsPage() {
   const projects = await prisma.project.findMany({
     orderBy: { createdAt: "desc" },
     include: {
+      tasks: {
+        select: { status: true }
+      },
       _count: {
         select: { tasks: true }
       }
@@ -21,17 +26,36 @@ export default async function ProjectsPage() {
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center">
+      {/* Print-only Header */}
+      <div className="hidden print:block mb-8">
+        <div className="flex justify-between items-end border-b-2 border-slate-800 pb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Overall Projects Report</h1>
+            <p className="text-slate-600 mt-1">Status of all active and completed projects</p>
+          </div>
+          <div className="text-right">
+            <h3 className="font-bold text-slate-900">PROTIME / PRMC</h3>
+            <p className="text-sm text-slate-500">{new Date().toLocaleDateString('en-IN')}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 no-print">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Projects</h2>
           <p className="text-slate-500">Manage your construction sites and NOCs.</p>
         </div>
-        <Link href="/dashboard/projects/add">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
-            <Plus className="w-4 h-4 mr-2" />
-            New Project
-          </Button>
-        </Link>
+        <div className="flex space-x-3">
+          {isAdmin && <GlobalProjectsReportButtons projects={projects} />}
+          {isAdmin && (
+            <Link href="/dashboard/projects/add">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
+                <Plus className="w-4 h-4 mr-2" />
+                New Project
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden">
