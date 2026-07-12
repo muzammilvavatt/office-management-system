@@ -238,7 +238,7 @@ export function PersonalInfoForm({ user }: { user: any }) {
           Update your contact details and basic information.
         </CardDescription>
       </CardHeader>
-      <form action={formAction}>
+      <form action={formAction} key={user.updatedAt?.toString() || user.id}>
         <CardContent className="pt-6 space-y-4">
           {state?.error && (
             <div className="p-3 text-sm text-rose-700 bg-rose-50 rounded-md border border-rose-200 font-medium">
