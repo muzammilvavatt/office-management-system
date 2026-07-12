@@ -67,6 +67,19 @@ export function EditEmployeeForm({
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="phoneNumber" className="text-slate-700 font-medium">WhatsApp Phone Number</Label>
+                <Input
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  type="tel"
+                  defaultValue={employee.phoneNumber || ""}
+                  placeholder="+919876543210"
+                  className="bg-white border-slate-300 focus-visible:ring-blue-500 text-slate-900"
+                />
+                <p className="text-xs text-slate-500">Include country code for WhatsApp task assignments.</p>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="email" className="text-slate-700 font-medium">Email Address</Label>
                 <Input
                   id="email"

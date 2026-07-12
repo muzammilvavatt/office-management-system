@@ -101,6 +101,7 @@ export async function editEmployeeAction(id: string, prevState: any, formData: F
 
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
+  const phoneNumber = formData.get("phoneNumber") as string;
   const password = formData.get("password") as string;
   const role = formData.get("role") as string;
   const projectRoles = formData.getAll("projectRoles") as string[];
@@ -116,7 +117,7 @@ export async function editEmployeeAction(id: string, prevState: any, formData: F
     return { error: "Email already in use by another employee" };
   }
 
-  const updateData: any = { name, email, role };
+  const updateData: any = { name, email, role, phoneNumber: phoneNumber || null };
 
   if (password) {
     const salt = bcrypt.genSaltSync(10);
