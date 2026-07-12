@@ -10,8 +10,19 @@ export default async function TasksPage() {
   const session = await getSession();
   const isAdmin = session?.user?.role === "ADMIN";
 
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const baseWhere = {
+    OR: [
+      { status: { not: "COMPLETED" } },
+      { status: "COMPLETED", completedAt: { gte: sevenDaysAgo } }
+    ]
+  };
+
   const tasks = await prisma.task.findMany({
-    where: isAdmin ? {} : {
+    where: isAdmin ? baseWhere : {
+      ...baseWhere,
       assignees: {
         some: { userId: session?.user?.id }
       }

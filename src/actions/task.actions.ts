@@ -301,13 +301,17 @@ export async function updateTaskStatusDragAction(id: string, status: string) {
   const session = await getSession();
   
   let progress = 0;
-  if (status === "COMPLETED") progress = 100;
+  let completedAt = null;
+  if (status === "COMPLETED") {
+    progress = 100;
+    completedAt = new Date();
+  }
   if (status === "IN_PROGRESS") progress = 50;
   if (status === "PENDING") progress = 0;
 
   await prisma.task.update({
     where: { id },
-    data: { status, progress },
+    data: { status, progress, ...(completedAt ? { completedAt } : {}) },
   });
 
   if (session?.user?.id) {

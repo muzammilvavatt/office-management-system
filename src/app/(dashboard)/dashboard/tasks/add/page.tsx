@@ -17,6 +17,7 @@ export default async function AddTaskPage() {
   });
 
   const tasks = await prisma.task.findMany({
+    where: { status: { not: "COMPLETED" } },
     orderBy: { createdAt: "desc" },
     include: { project: true }
   });
