@@ -16,7 +16,7 @@ export function ProjectReportButtons({ project, tasks }: { project: any, tasks: 
     const totalTasks = tasks.length;
     
     const textLines = [
-      `*Project Status: ${project.name}*`,
+      `*Project:* ${project.name}`,
       `*Overall Progress:* ${completedTasks}/${totalTasks} Tasks Completed`,
       ``,
     ];
