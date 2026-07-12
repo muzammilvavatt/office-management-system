@@ -124,6 +124,11 @@ export async function updateProfilePictureAction(url: string) {
   const session = await getSession();
   if (!session?.user?.id) return { error: "Unauthorized" };
   
+  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+  if (user?.profilePictureUrl && user.role !== "ADMIN") {
+    return { error: "Profile picture already set. Please contact an Admin to change it." };
+  }
+
   await prisma.user.update({
     where: { id: session.user.id },
     data: { profilePictureUrl: url }

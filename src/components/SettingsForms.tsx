@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Lock, Settings as SettingsIcon, Image as ImageIcon, UploadCloud } from "lucide-react";
+import { Lock, Settings as SettingsIcon, Image as ImageIcon, UploadCloud, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -155,21 +155,34 @@ export function ProfilePictureForm({ user }: { user: any }) {
             )}
           </div>
           <div>
-            <input 
-              type="file" 
-              id="profile-upload" 
-              className="hidden" 
-              accept="image/*" 
-              onChange={handleUpload} 
-              disabled={isUploading}
-            />
-            <label htmlFor="profile-upload">
-              <span className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900 h-9 px-4 py-2 cursor-pointer ${isUploading ? 'opacity-50' : ''}`}>
-                <UploadCloud className="w-4 h-4 mr-2" />
-                {isUploading ? "Uploading..." : "Upload New Photo"}
-              </span>
-            </label>
-            <p className="text-xs text-slate-500 mt-2">JPEG or PNG under 5MB.</p>
+            {user.profilePictureUrl ? (
+              <div>
+                <p className="text-sm font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 inline-block mb-2">
+                  <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4"/> Photo verified</span>
+                </p>
+                <p className="text-xs text-slate-500">
+                  To change your verification photo, please contact an Admin.
+                </p>
+              </div>
+            ) : (
+              <>
+                <input 
+                  type="file" 
+                  id="profile-upload" 
+                  className="hidden" 
+                  accept="image/*" 
+                  onChange={handleUpload} 
+                  disabled={isUploading}
+                />
+                <label htmlFor="profile-upload">
+                  <span className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900 h-9 px-4 py-2 cursor-pointer ${isUploading ? 'opacity-50' : ''}`}>
+                    <UploadCloud className="w-4 h-4 mr-2" />
+                    {isUploading ? "Uploading..." : "Upload New Photo"}
+                  </span>
+                </label>
+                <p className="text-xs text-slate-500 mt-2">JPEG or PNG under 5MB.</p>
+              </>
+            )}
           </div>
         </div>
       </CardContent>
