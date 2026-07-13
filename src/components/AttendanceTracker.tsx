@@ -171,6 +171,7 @@ export function AttendanceTracker({
       },
       cancel: {
         label: "Cancel",
+        onClick: () => {}
       }
     });
   };
