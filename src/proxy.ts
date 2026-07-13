@@ -5,6 +5,14 @@ import { getSession } from "./lib/session";
 const protectedRoutes = ["/dashboard"];
 const publicRoutes = ["/login"];
 
+const ADMIN_ONLY_ROUTES = [
+  '/dashboard/projects',
+  '/dashboard/employees',
+  '/dashboard/attendance',
+  '/dashboard/reports',
+  '/dashboard/settings/roles'
+];
+
 export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
   
@@ -28,6 +36,14 @@ export async function proxy(req: NextRequest) {
 
   if (isPublic && session) {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+  }
+
+  if (isProtected && session) {
+    // Admin route protection
+    const isAdminOnly = ADMIN_ONLY_ROUTES.some(route => path === route || path.startsWith(`${route}/`));
+    if (isAdminOnly && session?.user?.role !== 'ADMIN') {
+      return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
+    }
   }
 
   return NextResponse.next();
