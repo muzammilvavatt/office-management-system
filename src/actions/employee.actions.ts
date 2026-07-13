@@ -149,32 +149,3 @@ export async function editEmployeeAction(id: string, prevState: any, formData: F
   revalidatePath("/dashboard/employees");
   redirect("/dashboard/employees");
 }
-
-export async function adminDeleteEmployeePhotoAction(id: string) {
-  await requireAdmin();
-  
-  const user = await prisma.user.findUnique({ where: { id } });
-  if (!user?.profilePictureUrl) return;
-
-  try {
-    const urlParts = user.profilePictureUrl.split('/uploads/');
-    if (urlParts.length === 2) {
-      const filePath = urlParts[1];
-      const { createClient } = await import("@supabase/supabase-js");
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      );
-      await supabase.storage.from('uploads').remove([filePath]);
-    }
-  } catch (err) {
-    console.error("Failed to delete from Supabase", err);
-  }
-
-  await prisma.user.update({
-    where: { id },
-    data: { profilePictureUrl: null }
-  });
-
-  revalidatePath("/dashboard/employees");
-}

@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Users, Plus, CheckCircle2, XCircle, Pencil, Wifi, Building, CameraOff } from "lucide-react";
-import { toggleEmployeeStatus, toggleEmployeeWFH, deleteEmployeeAction, adminDeleteEmployeePhotoAction } from "@/actions/employee.actions";
+import { Users, Plus, CheckCircle2, XCircle, Pencil, Wifi, Building } from "lucide-react";
+import { toggleEmployeeStatus, toggleEmployeeWFH, deleteEmployeeAction } from "@/actions/employee.actions";
 import { getSession } from "@/lib/session";
 import { DeleteButton } from "@/components/DeleteButton";
 
@@ -113,13 +113,6 @@ export default async function EmployeesPage() {
                               <Pencil className="w-3.5 h-3.5" />
                             </Button>
                           </Link>
-                          {employee.profilePictureUrl && (
-                            <form action={adminDeleteEmployeePhotoAction.bind(null, employee.id)}>
-                              <Button type="submit" variant="ghost" size="sm" className="h-7 w-7 p-0 text-rose-600 hover:bg-rose-50 rounded-lg" title="Reset Biometric Photo">
-                                <CameraOff className="w-3.5 h-3.5" />
-                              </Button>
-                            </form>
-                          )}
                           <form action={deleteEmployeeAction.bind(null, employee.id)}>
                             <DeleteButton itemName="Employee" />
                           </form>
