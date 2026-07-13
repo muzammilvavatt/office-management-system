@@ -147,6 +147,9 @@ export function AttendanceTracker({
   };
 
   const handleClockOut = () => {
+    if (!window.confirm("Are you sure you want to clock out? You will not be able to clock back in today.")) {
+      return;
+    }
     setErrorMsg(null);
     startTransition(async () => {
       await clockOutAction();
