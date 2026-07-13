@@ -86,9 +86,50 @@ export async function toggleEmployeeWFH(id: string, currentStatus: boolean) {
 
 export async function deleteEmployeeAction(id: string) {
   await requireAdmin();
+  
+  // 1. Fetch user to see if they have photos that need deleting
+  const user = await prisma.user.findUnique({
+    where: { id },
+    include: { attendances: true }
+  });
+
+  if (user) {
+    const filesToDelete: string[] = [];
+    
+    // Check profile picture
+    if (user.profilePictureUrl) {
+      const urlParts = user.profilePictureUrl.split('/uploads/');
+      if (urlParts.length === 2) filesToDelete.push(urlParts[1]);
+    }
+    
+    // Check attendance photos
+    for (const attendance of user.attendances) {
+      if (attendance.photoUrl) {
+        const urlParts = attendance.photoUrl.split('/uploads/');
+        if (urlParts.length === 2) filesToDelete.push(urlParts[1]);
+      }
+    }
+
+    // Delete from Supabase
+    if (filesToDelete.length > 0) {
+      try {
+        const { createClient } = await import("@supabase/supabase-js");
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+        await supabase.storage.from('uploads').remove(filesToDelete);
+      } catch (err) {
+        console.error("Failed to delete user photos from Supabase", err);
+      }
+    }
+  }
+
+  // 2. Delete the user from the database
   await prisma.user.delete({
     where: { id },
   });
+  
   revalidatePath("/dashboard/employees");
 }
 
