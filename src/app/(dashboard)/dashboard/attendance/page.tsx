@@ -134,9 +134,13 @@ export default async function AttendanceAdminPage(props: { searchParams?: Promis
                   <tr key={user.id} className="hover:bg-slate-50/60 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 border border-indigo-200 flex items-center justify-center text-xs font-bold text-indigo-700 shrink-0">
-                          {initials}
-                        </div>
+                        {user.profilePictureUrl ? (
+                          <img src={user.profilePictureUrl} alt={user.name} className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0 shadow-sm" />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 border border-indigo-200 flex items-center justify-center text-xs font-bold text-indigo-700 shrink-0">
+                            {initials}
+                          </div>
+                        )}
                         <div>
                           <p className="font-semibold text-slate-900">{user.name}</p>
                           <p className="text-xs text-slate-400">{user.role.replace(/_/g, " ")}</p>
