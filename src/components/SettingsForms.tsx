@@ -6,10 +6,10 @@ import { Lock, Settings as SettingsIcon, Image as ImageIcon, UploadCloud, CheckC
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { changePasswordAction, updateGlobalSettingsAction, updateProfilePictureAction, updatePersonalInfoAction } from "@/actions/settings.actions";
+import { changePasswordAction, updateGlobalSettingsAction, updateProfilePictureAction, updatePersonalInfoAction, deleteProfilePictureAction } from "@/actions/settings.actions";
 import { uploadFileToServerAction } from "@/actions/upload.actions";
-import { useTransition } from "react";
-import { User } from "lucide-react";
+import { useTransition, useActionState } from "react";
+import { User, Trash2 } from "lucide-react";
 
 export function ChangePasswordForm() {
   const [state, formAction, isPending] = useActionState(changePasswordAction, undefined);
@@ -147,9 +147,20 @@ export function ProfilePictureForm({ user }: { user: any }) {
                 <p className="text-sm font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 inline-block mb-2">
                   <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4"/> Photo verified</span>
                 </p>
-                <p className="text-xs text-slate-500">
-                  To change your verification photo, please contact an Admin.
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-slate-500">
+                    To change your verification photo, please contact an Admin.
+                  </p>
+                  <form action={async () => {
+                    if (confirm("Are you sure you want to delete your biometric data? You will not be able to clock in using AI until you upload a new photo.")) {
+                      await deleteProfilePictureAction();
+                    }
+                  }}>
+                    <button type="submit" className="text-xs text-rose-600 hover:text-rose-700 font-semibold bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded-md ring-1 ring-rose-200 transition-colors flex items-center gap-1">
+                      <Trash2 className="w-3 h-3" /> Delete Data
+                    </button>
+                  </form>
+                </div>
               </div>
             ) : (
               <>
