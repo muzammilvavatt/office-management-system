@@ -5,7 +5,7 @@ import { Clock, Calendar as CalendarIcon, CheckCircle2, XCircle, AlertCircle, Ca
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AttendanceDatePicker } from "@/components/AttendanceDatePicker";
-import { approveAttendancePhotoAction } from "@/actions/attendance.actions";
+import { approveAttendancePhotoAction, rejectAttendanceAction } from "@/actions/attendance.actions";
 
 export default async function AttendanceAdminPage(props: { searchParams?: Promise<{ date?: string }> }) {
   const session = await getSession();
@@ -164,11 +164,18 @@ export default async function AttendanceAdminPage(props: { searchParams?: Promis
                             <img src={record.photoUrl} alt="Selfie" className="w-10 h-10 object-cover rounded-lg ring-1 ring-slate-200 shadow-sm" />
                           </a>
                           {!record.isPhotoApproved && (
-                             <form action={approveAttendancePhotoAction.bind(null, record.id)}>
-                               <button type="submit" className="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-2.5 py-1.5 rounded-md font-semibold ring-1 ring-indigo-200 transition-colors shadow-sm">
-                                 Approve
-                               </button>
-                             </form>
+                             <div className="flex flex-col gap-1">
+                               <form action={approveAttendancePhotoAction.bind(null, record.id)}>
+                                 <Button type="submit" size="sm" className="h-6 px-2 text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white rounded-md w-full">
+                                   Approve
+                                 </Button>
+                               </form>
+                               <form action={rejectAttendanceAction.bind(null, record.id)}>
+                                 <Button type="submit" size="sm" className="h-6 px-2 text-[10px] bg-rose-600 hover:bg-rose-700 text-white rounded-md w-full">
+                                   Reject
+                                 </Button>
+                               </form>
+                             </div>
                           )}
                         </div>
                       ) : record?.isPhotoApproved ? (

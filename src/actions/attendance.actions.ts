@@ -179,9 +179,21 @@ export async function approveAttendancePhotoAction(attendanceId: string) {
 
   if (!attendance || !attendance.photoUrl) return;
 
-  // We could delete from Supabase storage here via Admin API, 
-  // but we can also just wipe the URL from the DB for simplicity and 
-  // let a cron job clean up unreferenced photos, or do it immediately.
+  // Delete from Supabase storage to save space
+  try {
+    const urlParts = attendance.photoUrl.split('/uploads/');
+    if (urlParts.length === 2) {
+      const filePath = urlParts[1];
+      const { createClient } = await import("@supabase/supabase-js");
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+      await supabase.storage.from('uploads').remove([filePath]);
+    }
+  } catch (err) {
+    console.error("Failed to delete attendance photo from Supabase", err);
+  }
   
   await prisma.attendance.update({
     where: { id: attendanceId },
@@ -189,6 +201,44 @@ export async function approveAttendancePhotoAction(attendanceId: string) {
       isPhotoApproved: true,
       photoUrl: null // Wipe it from DB
     }
+  });
+
+  revalidatePath("/dashboard/attendance");
+}
+
+export async function rejectAttendanceAction(attendanceId: string) {
+  const session = await getSession();
+  if (!session || session.user?.role !== "ADMIN") {
+    throw new Error("Unauthorized");
+  }
+
+  const attendance = await prisma.attendance.findUnique({
+    where: { id: attendanceId }
+  });
+
+  if (!attendance) return;
+
+  // Delete photo from Supabase if it exists
+  if (attendance.photoUrl) {
+    try {
+      const urlParts = attendance.photoUrl.split('/uploads/');
+      if (urlParts.length === 2) {
+        const filePath = urlParts[1];
+        const { createClient } = await import("@supabase/supabase-js");
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+        await supabase.storage.from('uploads').remove([filePath]);
+      }
+    } catch (err) {
+      console.error("Failed to delete attendance photo from Supabase", err);
+    }
+  }
+
+  // Delete the attendance record entirely (or you could mark it as REJECTED)
+  await prisma.attendance.delete({
+    where: { id: attendanceId }
   });
 
   revalidatePath("/dashboard/attendance");
