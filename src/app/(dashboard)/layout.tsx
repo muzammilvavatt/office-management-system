@@ -21,7 +21,10 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   const session = await getSession();
   const isAdmin = session?.user?.role === "ADMIN";
   
-  const dbUser = session?.user?.id ? await prisma.user.findUnique({ where: { id: session.user.id } }) : null;
+  const dbUser = session?.user?.id ? await prisma.user.findUnique({ 
+    where: { id: session.user.id },
+    select: { name: true, profilePictureUrl: true }
+  }) : null;
   const userName: string = dbUser?.name ?? (isAdmin ? "Admin" : "Employee");
   const profilePictureUrl = dbUser?.profilePictureUrl;
   const initials = userName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
@@ -47,6 +50,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
               </span>
             </div>
             {profilePictureUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img src={profilePictureUrl} alt={userName} className="w-9 h-9 rounded-full object-cover shadow-sm ring-2 ring-white" />
             ) : (
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white shadow-sm ring-2 ring-white">

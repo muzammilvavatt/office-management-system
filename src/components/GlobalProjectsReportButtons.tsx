@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Printer, Copy, Check } from "lucide-react";
 
-export function GlobalProjectsReportButtons({ projects }: { projects: any[] }) {
+export function GlobalProjectsReportButtons({ projects }: { projects: { name: string, clientName: string, status: string, tasks?: { status: string }[], _count?: { tasks: number } }[] }) {
   const [copied, setCopied] = useState(false);
 
   const handlePrint = () => window.print();

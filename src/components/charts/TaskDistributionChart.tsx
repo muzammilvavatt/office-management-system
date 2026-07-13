@@ -36,6 +36,7 @@ export function TaskDistributionChart({ data }: { data: DataItem[] }) {
             ))}
           </Pie>
           <Tooltip 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             formatter={(value: any) => [`${value} Tasks`, 'Count']}
             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
           />

@@ -87,7 +87,7 @@ export function ChangePasswordForm() {
   );
 }
 
-export function ProfilePictureForm({ user }: { user: any }) {
+export function ProfilePictureForm({ user }: { user: { id: string, profilePictureUrl: string | null } }) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -107,8 +107,12 @@ export function ProfilePictureForm({ user }: { user: any }) {
 
       const publicUrl = await uploadFileToServerAction(formData, filePath);
       const res = await updateProfilePictureAction(publicUrl);
-    } catch (err: any) {
-      setError(err.message || "Failed to upload image");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Failed to upload image");
+      } else {
+        setError("Failed to upload image");
+      }
     } finally {
       setIsUploading(false);
     }
@@ -136,6 +140,7 @@ export function ProfilePictureForm({ user }: { user: any }) {
         <div className="flex items-center gap-6">
           <div className="w-24 h-24 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
             {user.profilePictureUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img src={user.profilePictureUrl} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <ImageIcon className="w-8 h-8 text-slate-400" />
@@ -235,7 +240,7 @@ export function AdminGlobalSettingsForm({ initialRequireSelfie }: { initialRequi
   );
 }
 
-export function PersonalInfoForm({ user }: { user: any }) {
+export function PersonalInfoForm({ user }: { user: { id: string, email: string, name: string, phoneNumber: string | null, updatedAt?: Date } }) {
   const [state, formAction, isPending] = useActionState(updatePersonalInfoAction, undefined);
 
   return (

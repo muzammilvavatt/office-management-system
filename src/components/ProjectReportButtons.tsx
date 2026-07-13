@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Printer, Copy, Check } from "lucide-react";
 
-export function ProjectReportButtons({ project, tasks }: { project: any, tasks: any[] }) {
+export function ProjectReportButtons({ project, tasks }: { project: { name: string }, tasks: { name: string, status: string, assignees: { user: { name: string } }[] }[] }) {
   const [copied, setCopied] = useState(false);
 
   const handlePrint = () => window.print();
@@ -21,7 +21,7 @@ export function ProjectReportButtons({ project, tasks }: { project: any, tasks: 
       textLines.push(`No tasks assigned yet.`);
     } else {
       tasks.forEach(task => {
-        const assignees = task.assignees.map((a: any) => a.user.name).join(", ") || "Unassigned";
+        const assignees = task.assignees.map(a => a.user.name).join(", ") || "Unassigned";
         const statusStr = task.status === "COMPLETED" ? "*Completed* ✅" : `*${task.status.replace(/_/g, " ")}* ⏳`;
         textLines.push(`- ${task.name}: ${statusStr} (${assignees})`);
       });

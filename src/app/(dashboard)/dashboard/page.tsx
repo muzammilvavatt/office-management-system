@@ -9,6 +9,9 @@ import {
   Plus,
   ClipboardList,
   FileBarChart2,
+  Activity,
+  UserPlus,
+  ArrowRight,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
@@ -62,6 +65,19 @@ export default async function DashboardPage() {
       }))
       .filter((u) => u.tasks > 0);
 
+    const [recentTaskUpdates, recentEmployees] = await Promise.all([
+      prisma.task.findMany({
+        orderBy: { updatedAt: "desc" },
+        take: 5,
+        select: { id: true, name: true, status: true, updatedAt: true, project: { select: { name: true } } },
+      }),
+      prisma.user.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 3,
+        select: { id: true, name: true, createdAt: true, role: true },
+      }),
+    ]);
+
     adminData = {
       employeeCount,
       projectCount,
@@ -69,6 +85,8 @@ export default async function DashboardPage() {
       pendingTaskCount,
       taskDistributionData,
       employeeWorkloadData,
+      recentTaskUpdates,
+      recentEmployees,
     };
   }
 
@@ -195,106 +213,184 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          {/* ── Stat Cards ── */}
+          {/* ── Stat Cards (clickable) ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 stagger-children animate-fade-in-up">
             {/* Projects */}
-            <div className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm p-5 flex flex-col gap-4 relative overflow-hidden">
-              <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center shrink-0">
-                  <FolderKanban className="w-5 h-5 text-indigo-600" />
+            <Link href="/dashboard/projects">
+              <div className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm p-5 flex flex-col gap-4 relative overflow-hidden hover:ring-indigo-300 hover:shadow-md transition-all group cursor-pointer">
+                <div className="flex items-start justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center shrink-0 group-hover:from-indigo-100 group-hover:to-indigo-200 transition-colors">
+                    <FolderKanban className="w-5 h-5 text-indigo-600" />
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
                 </div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold tracking-tight text-slate-900">
-                  {adminData.projectCount}
+                <div>
+                  <div className="text-4xl font-bold tracking-tight text-slate-900">
+                    {adminData.projectCount}
+                  </div>
+                  <p className="text-sm text-slate-500 font-medium mt-1">Total Projects</p>
                 </div>
-                <p className="text-sm text-slate-500 font-medium mt-1">
-                  Total Projects
-                </p>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-b-xl" />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-b-xl" />
-            </div>
+            </Link>
 
             {/* Tasks */}
-            <div className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm p-5 flex flex-col gap-4 relative overflow-hidden">
-              <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center shrink-0">
-                  <CheckSquare className="w-5 h-5 text-emerald-600" />
+            <Link href="/dashboard/tasks">
+              <div className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm p-5 flex flex-col gap-4 relative overflow-hidden hover:ring-emerald-300 hover:shadow-md transition-all group cursor-pointer">
+                <div className="flex items-start justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center shrink-0 group-hover:from-emerald-100 group-hover:to-emerald-200 transition-colors">
+                    <CheckSquare className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all" />
                 </div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold tracking-tight text-slate-900">
-                  {adminData.taskCount}
+                <div>
+                  <div className="text-4xl font-bold tracking-tight text-slate-900">
+                    {adminData.taskCount}
+                  </div>
+                  <p className="text-sm text-slate-500 font-medium mt-1">Total Tasks</p>
                 </div>
-                <p className="text-sm text-slate-500 font-medium mt-1">
-                  Total Tasks
-                </p>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-b-xl" />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-b-xl" />
-            </div>
+            </Link>
 
             {/* Pending */}
-            <div className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm p-5 flex flex-col gap-4 relative overflow-hidden">
-              <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center shrink-0">
-                  <AlertCircle className="w-5 h-5 text-amber-600" />
+            <Link href="/dashboard/tasks">
+              <div className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm p-5 flex flex-col gap-4 relative overflow-hidden hover:ring-amber-300 hover:shadow-md transition-all group cursor-pointer">
+                <div className="flex items-start justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center shrink-0 group-hover:from-amber-100 group-hover:to-amber-200 transition-colors">
+                    <AlertCircle className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all" />
                 </div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold tracking-tight text-slate-900">
-                  {adminData.pendingTaskCount}
+                <div>
+                  <div className="text-4xl font-bold tracking-tight text-slate-900">
+                    {adminData.pendingTaskCount}
+                  </div>
+                  <p className="text-sm text-slate-500 font-medium mt-1">Pending Tasks</p>
                 </div>
-                <p className="text-sm text-slate-500 font-medium mt-1">
-                  Pending Tasks
-                </p>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 to-amber-500 rounded-b-xl" />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 to-amber-500 rounded-b-xl" />
-            </div>
+            </Link>
 
             {/* Employees */}
-            <div className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm p-5 flex flex-col gap-4 relative overflow-hidden">
-              <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-50 to-violet-100 flex items-center justify-center shrink-0">
-                  <Users className="w-5 h-5 text-violet-600" />
+            <Link href="/dashboard/employees">
+              <div className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm p-5 flex flex-col gap-4 relative overflow-hidden hover:ring-violet-300 hover:shadow-md transition-all group cursor-pointer">
+                <div className="flex items-start justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-50 to-violet-100 flex items-center justify-center shrink-0 group-hover:from-violet-100 group-hover:to-violet-200 transition-colors">
+                    <Users className="w-5 h-5 text-violet-600" />
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all" />
                 </div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold tracking-tight text-slate-900">
-                  {adminData.employeeCount}
+                <div>
+                  <div className="text-4xl font-bold tracking-tight text-slate-900">
+                    {adminData.employeeCount}
+                  </div>
+                  <p className="text-sm text-slate-500 font-medium mt-1">Employees</p>
                 </div>
-                <p className="text-sm text-slate-500 font-medium mt-1">
-                  Employees
-                </p>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-400 to-violet-600 rounded-b-xl" />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-400 to-violet-600 rounded-b-xl" />
-            </div>
+            </Link>
           </div>
 
-          {/* ── Charts ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in-up">
-            <Card className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm border-0">
-              <CardHeader className="border-b border-slate-100 pb-4">
-                <CardTitle className="flex items-center text-lg font-bold text-slate-800">
-                  <PieChartIcon className="w-5 h-5 mr-2 text-indigo-600" />
-                  Task Status Distribution
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <TaskDistributionChart data={adminData.taskDistributionData} />
-              </CardContent>
-            </Card>
+          {/* ── Charts + Recent Activity ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in-up">
+            {/* Charts (2/3 width) */}
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <Card className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm border-0">
+                <CardHeader className="border-b border-slate-100 pb-4">
+                  <CardTitle className="flex items-center text-lg font-bold text-slate-800">
+                    <PieChartIcon className="w-5 h-5 mr-2 text-indigo-600" />
+                    Task Status
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <TaskDistributionChart data={adminData.taskDistributionData} />
+                </CardContent>
+              </Card>
 
-            <Card className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm border-0">
-              <CardHeader className="border-b border-slate-100 pb-4">
-                <CardTitle className="flex items-center text-lg font-bold text-slate-800">
-                  <BarChart3 className="w-5 h-5 mr-2 text-indigo-600" />
-                  Employee Workload
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <EmployeeWorkloadChart data={adminData.employeeWorkloadData} />
-              </CardContent>
-            </Card>
+              <Card className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm border-0">
+                <CardHeader className="border-b border-slate-100 pb-4">
+                  <CardTitle className="flex items-center text-lg font-bold text-slate-800">
+                    <BarChart3 className="w-5 h-5 mr-2 text-indigo-600" />
+                    Employee Workload
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <EmployeeWorkloadChart data={adminData.employeeWorkloadData} />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Activity Feed (1/3 width) */}
+            <div className="space-y-5">
+              {/* Recent Task Updates */}
+              <Card className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm border-0">
+                <CardHeader className="border-b border-slate-100 pb-3 pt-4 px-5">
+                  <CardTitle className="flex items-center text-sm font-bold text-slate-800">
+                    <Activity className="w-4 h-4 mr-2 text-indigo-500" />
+                    Recent Task Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y divide-slate-50">
+                    {adminData.recentTaskUpdates.map((task) => {
+                      const statusColors: Record<string, string> = {
+                        COMPLETED: "bg-emerald-400",
+                        IN_PROGRESS: "bg-indigo-400",
+                        REVIEW: "bg-violet-400",
+                        PENDING: "bg-slate-300",
+                      };
+                      return (
+                        <Link key={task.id} href={`/dashboard/tasks/${task.id}`}>
+                          <div className="px-5 py-3 flex items-start gap-3 hover:bg-slate-50 transition-colors group">
+                            <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${statusColors[task.status] ?? "bg-slate-300"}`} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">{task.name}</p>
+                              <p className="text-[10px] text-slate-400 mt-0.5">{task.project.name} · {task.status.replace(/_/g, " ")}</p>
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Recently Added Employees */}
+              <Card className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm border-0">
+                <CardHeader className="border-b border-slate-100 pb-3 pt-4 px-5">
+                  <CardTitle className="flex items-center text-sm font-bold text-slate-800">
+                    <UserPlus className="w-4 h-4 mr-2 text-violet-500" />
+                    New Team Members
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y divide-slate-50">
+                    {adminData.recentEmployees.map((emp) => {
+                      const initials = emp.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
+                      return (
+                        <Link key={emp.id} href={`/dashboard/employees/${emp.id}/edit`}>
+                          <div className="px-5 py-3 flex items-center gap-3 hover:bg-slate-50 transition-colors group">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                              {initials}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">{emp.name}</p>
+                              <p className="text-[10px] text-slate-400 capitalize">{emp.role.toLowerCase()}</p>
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                  <div className="px-5 py-3 border-t border-slate-50">
+                    <Link href="/dashboard/employees" className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1">
+                      View all employees <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </>
       )}

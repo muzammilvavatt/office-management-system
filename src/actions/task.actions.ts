@@ -248,7 +248,7 @@ export async function requestTimeExtensionAction(taskId: string, formData: FormD
       data: {
         userId: admin.id,
         type: "TIME_EXTENSION_REQUESTED",
-        message: `${session.user.name || 'An employee'} requested ${hours} extra hours for task: ${task?.name || 'Unknown'}`,
+        message: `An employee requested ${hours} extra hours for task: ${task?.name || 'Unknown'}`,
       }
     });
   }
