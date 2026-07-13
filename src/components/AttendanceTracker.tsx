@@ -7,6 +7,7 @@ import Webcam from "react-webcam";
 import * as faceapi from "face-api.js";
 import { uploadFileToServerAction } from "@/actions/upload.actions";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 interface AttendanceRecord {
   clockIn: string;
@@ -138,7 +139,12 @@ export function AttendanceTracker({
         const { latitude, longitude } = position.coords;
         startTransition(async () => {
           const res = await clockInAction({ lat: latitude, lng: longitude }, photoUrl, isPhotoApproved);
-          if (res?.error) setErrorMsg(res.error);
+          if (res?.error) {
+            setErrorMsg(res.error);
+            toast.error(res.error);
+          } else {
+            toast.success("Successfully clocked in! Have a great day at work.");
+          }
         });
       },
       () => setErrorMsg("Failed to get location. Please allow location access."),
@@ -152,7 +158,12 @@ export function AttendanceTracker({
     }
     setErrorMsg(null);
     startTransition(async () => {
-      await clockOutAction();
+      const res = await clockOutAction();
+      if (res?.error) {
+        toast.error(res.error);
+      } else {
+        toast.success("Successfully clocked out! Great work today.");
+      }
     });
   };
 

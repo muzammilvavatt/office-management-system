@@ -15,6 +15,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 type Assignee = {
   user: {
@@ -126,10 +127,16 @@ export function TaskList({
 
   const handleStatusChange = (taskId: string, newStatus: string) => {
     startTransition(async () => {
-      if (newStatus === "REVIEW") {
-        await submitForReviewAction(taskId);
-      } else {
-        await updateTaskStatusDragAction(taskId, newStatus);
+      try {
+        if (newStatus === "REVIEW") {
+          await submitForReviewAction(taskId);
+          toast.success("Task submitted for review!");
+        } else {
+          await updateTaskStatusDragAction(taskId, newStatus);
+          toast.success(`Task moved to ${formatStatus(newStatus)}`);
+        }
+      } catch (err: unknown) {
+        toast.error("Failed to update task status.");
       }
     });
   };

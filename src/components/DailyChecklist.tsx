@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { toggleDailyTaskAction } from "@/actions/daily-tasks.actions";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CheckCircle2, Circle, ListTodo } from "lucide-react";
+import { toast } from "sonner";
 
 interface ChecklistTask {
   id: string;
@@ -16,8 +17,18 @@ export function DailyChecklist({ tasks }: { tasks: ChecklistTask[] }) {
   const [isPending, startTransition] = useTransition();
 
   const handleToggle = (id: string, currentStatus: string) => {
-    startTransition(() => {
-      toggleDailyTaskAction(id, currentStatus);
+    startTransition(async () => {
+      try {
+        await toggleDailyTaskAction(id, currentStatus);
+        const newStatus = currentStatus === "COMPLETED" ? "PENDING" : "COMPLETED";
+        if (newStatus === "COMPLETED") {
+          toast.success("Checklist item completed!");
+        } else {
+          toast.info("Checklist item unchecked.");
+        }
+      } catch (err: unknown) {
+        toast.error("Failed to update checklist item.");
+      }
     });
   };
 
