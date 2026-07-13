@@ -81,12 +81,14 @@ export function AttendanceTracker({
           
           if (refDetection && capturedDetection) {
             const distance = faceapi.euclideanDistance(refDetection.descriptor, capturedDetection.descriptor);
-            console.log("Face Match Distance:", distance); // Lower is better
+            console.log("Face Match Distance:", distance);
             
-            // 0.6 is the default, but often too lenient for TinyFaceDetector.
-            // 0.45 is much stricter and prevents false positives.
-            if (distance < 0.45) {
+            // VERY STRICT threshold. Default is 0.6. 
+            // 0.38 prevents almost all false positives.
+            if (distance < 0.38) {
               isMatch = true; // AI matched!
+            } else {
+              alert(`Debug: Faces did not match. Distance: ${distance.toFixed(3)} (needs to be < 0.38)`);
             }
           }
         } catch (aiError) {
