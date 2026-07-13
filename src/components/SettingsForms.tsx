@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { changePasswordAction, updateGlobalSettingsAction, updateProfilePictureAction, updatePersonalInfoAction, deleteProfilePictureAction } from "@/actions/settings.actions";
 import { uploadFileToServerAction } from "@/actions/upload.actions";
-import { useTransition, useActionState } from "react";
+import { useTransition } from "react";
 import { User, Trash2 } from "lucide-react";
 
 export function ChangePasswordForm() {
