@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/session";
-import { supabase } from "@/lib/supabase";
+import { uploadToGDrive } from "@/lib/gdrive";
 
 export async function uploadFileAction(formData: FormData) {
   const session = await getSession();
@@ -24,23 +24,8 @@ export async function uploadFileAction(formData: FormData) {
   const uniqueName = `${Date.now()}-${file.name.replace(/\s+/g, "_")}`;
   
   try {
-    // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("uploads")
-      .upload(uniqueName, buffer, {
-        contentType: file.type || "application/octet-stream",
-        upsert: false
-      });
-
-    if (uploadError) {
-      console.error("Supabase Storage Error:", uploadError);
-      return { error: "Failed to upload file to cloud storage." };
-    }
-
-    // Get the public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from("uploads")
-      .getPublicUrl(uniqueName);
+    // Upload to Google Drive
+    const publicUrl = await uploadToGDrive(buffer, uniqueName, file.type || "application/octet-stream");
     
     // Save to DB
     await prisma.file.create({
