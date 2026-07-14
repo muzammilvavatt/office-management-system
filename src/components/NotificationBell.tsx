@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { getNotificationsAction, markNotificationsAsReadAction } from "@/actions/notification.actions";
+import { getNotificationsAction, markNotificationsAsReadAction, clearAllNotificationsAction } from "@/actions/notification.actions";
+import { Trash2 } from "lucide-react";
 
 interface AppNotification {
   id: string;
@@ -33,6 +34,14 @@ export function NotificationBell() {
     }
   };
 
+  const handleClearAll = async () => {
+    const res = await clearAllNotificationsAction();
+    if (res.success) {
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+  };
+
   return (
     <Popover onOpenChange={handleOpenChange}>
       <PopoverTrigger className="relative inline-flex items-center justify-center rounded-full h-8 w-8 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400">
@@ -42,8 +51,16 @@ export function NotificationBell() {
         )}
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0 mr-4 mt-2 bg-white rounded-xl shadow-lg border border-slate-200 z-50">
-        <div className="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl">
+        <div className="p-4 border-b border-slate-100 bg-slate-50 rounded-t-xl flex items-center justify-between">
           <h3 className="font-bold text-slate-800">Notifications</h3>
+          {notifications.length > 0 && (
+            <button 
+              onClick={handleClearAll}
+              className="text-xs text-slate-500 hover:text-rose-600 font-medium flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 rounded"
+            >
+              <Trash2 className="w-3 h-3" /> Clear All
+            </button>
+          )}
         </div>
         <div className="max-h-80 overflow-y-auto">
           {notifications.length === 0 ? (

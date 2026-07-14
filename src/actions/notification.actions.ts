@@ -42,3 +42,18 @@ export async function markNotificationsAsReadAction() {
     return { success: false };
   }
 }
+
+export async function clearAllNotificationsAction() {
+  const session = await getSession();
+  if (!session?.user?.id) return { success: false };
+
+  try {
+    await prisma.notification.deleteMany({
+      where: { userId: session.user.id }
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to clear notifications:", error);
+    return { success: false };
+  }
+}

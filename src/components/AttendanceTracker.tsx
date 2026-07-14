@@ -172,7 +172,8 @@ export function AttendanceTracker({ todayRecord, user, requireSelfieVerification
     });
 
   return (
-    <div className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm overflow-hidden animate-fade-in-up">
+    <>
+      <div className="bg-white rounded-xl ring-1 ring-slate-200 shadow-sm overflow-hidden animate-fade-in-up">
       <div className="bg-gradient-to-r from-indigo-600 to-violet-700 px-5 py-4 flex items-center gap-3">
         <div className="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center">
           <Clock className="w-5 h-5 text-white" />
@@ -346,7 +347,9 @@ export function AttendanceTracker({ todayRecord, user, requireSelfieVerification
           </div>
         )}
       </div>
+    </div>
 
+      {/* Modal is rendered outside the overflow-hidden container */}
       {showClockOutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-fade-in-up">
@@ -378,6 +381,6 @@ export function AttendanceTracker({ todayRecord, user, requireSelfieVerification
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

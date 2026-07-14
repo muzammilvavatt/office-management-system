@@ -8,6 +8,7 @@ import { UploadCloud, Loader2 } from "lucide-react";
 export function FileUpload({ taskId, projectId }: { taskId?: string, projectId?: string }) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   async function handleUpload(formData: FormData) {
@@ -25,6 +26,7 @@ export function FileUpload({ taskId, projectId }: { taskId?: string, projectId?:
         setError(result.error);
       } else {
         formRef.current?.reset();
+        setSelectedFileName(null);
       }
     } catch (_err) {
       setIsUploading(false);
@@ -36,18 +38,25 @@ export function FileUpload({ taskId, projectId }: { taskId?: string, projectId?:
     <form ref={formRef} action={handleUpload} className="flex flex-col space-y-3 p-4 border border-slate-200 rounded-lg bg-slate-50/50">
       <div className="flex items-center space-x-4">
         <label className="flex-1 flex items-center justify-center px-4 py-6 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors bg-white">
-          <div className="flex flex-col items-center space-y-1">
-            <UploadCloud className="w-8 h-8 text-slate-400" />
-            <span className="text-sm text-slate-700 font-semibold">Click to select a file</span>
+          <div className="flex flex-col items-center space-y-1 text-center">
+            <UploadCloud className={`w-8 h-8 ${selectedFileName ? 'text-indigo-500' : 'text-slate-400'}`} />
+            <span className="text-sm text-slate-700 font-semibold">
+              {selectedFileName ? selectedFileName : "Click to select a file"}
+            </span>
             <span className="text-xs text-slate-500 font-medium">PDF, DWG, DXF, PNG, JPG</span>
           </div>
-          <input type="file" name="file" className="hidden" required />
+          <input 
+            type="file" 
+            name="file" 
+            className="hidden" 
+            onChange={(e) => setSelectedFileName(e.target.files?.[0]?.name || null)}
+          />
         </label>
       </div>
       
       {error && <p className="text-xs text-red-600 font-medium">{error}</p>}
       
-      <Button type="submit" disabled={isUploading} className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
+      <Button type="submit" disabled={isUploading || !selectedFileName} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm rounded-xl">
         {isUploading ? (
           <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Uploading...</>
         ) : (
