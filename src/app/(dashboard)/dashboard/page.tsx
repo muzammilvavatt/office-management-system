@@ -276,7 +276,7 @@ export default async function DashboardPage() {
             <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-indigo-50 to-transparent rounded-bl-full pointer-events-none" />
             <div className="relative z-10">
               <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                {greeting}, Admin 👋
+                {greeting}, {session.user.name.split(" ")[0]} 👋
               </h1>
               <p className="text-sm text-slate-500 mt-0.5">{todayLabel}</p>
             </div>
