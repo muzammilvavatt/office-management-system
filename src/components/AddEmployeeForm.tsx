@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { createEmployeeAction } from "@/actions/employee.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ export function AddEmployeeForm({
   dailyResponsibilities: any[] 
 }) {
   const [state, formAction, isPending] = useActionState(createEmployeeAction, undefined);
+  const [selectedRole, setSelectedRole] = useState("EMPLOYEE");
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-10 animate-fade-in-up">
@@ -103,6 +104,8 @@ export function AddEmployeeForm({
                   id="role"
                   name="role"
                   required
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value)}
                   className="flex h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 text-slate-900"
                 >
                   <option value="EMPLOYEE">EMPLOYEE</option>
@@ -113,6 +116,7 @@ export function AddEmployeeForm({
             </CardContent>
           </Card>
 
+          {selectedRole !== "ADMIN" && (
           <div className="md:col-span-1 space-y-6">
             <Card className="bg-white ring-1 ring-slate-200 text-slate-900 shadow-sm rounded-xl border-0">
               <CardHeader className="border-b border-slate-100 pb-4">
@@ -166,9 +170,10 @@ export function AddEmployeeForm({
               </CardContent>
             </Card>
           </div>
+          )}
         </div>
 
-        <div className="mt-8 flex justify-end gap-3">
+        <div className="flex justify-end pt-6 mt-6 border-t border-slate-100">
           <Link href="/dashboard/employees">
             <Button type="button" variant="outline" className="rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50">
               Cancel
