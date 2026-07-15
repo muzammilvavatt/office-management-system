@@ -30,6 +30,8 @@ model User {
   projectRoles           UserProjectRole[]
   dailyResponsibilities  UserDailyResponsibility[]
   dailyTaskLogs          DailyTaskLog[]
+
+  @@index([role, isActive])
 }
 
 model Project {
@@ -50,6 +52,8 @@ model Project {
 
   tasks       Task[]
   files       File[]
+
+  @@index([status])
 }
 
 model Task {
@@ -83,6 +87,9 @@ model Task {
 
   assignees   TaskAssignee[]
   files       File[]
+
+  @@index([projectId])
+  @@index([status])
 }
 
 model TaskAssignee {
@@ -111,6 +118,9 @@ model File {
   task        Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   createdAt   DateTime @default(now())
+
+  @@index([projectId])
+  @@index([taskId])
 }
 
 model Notification {
@@ -123,6 +133,8 @@ model Notification {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
 }
 
 model ActivityLog {
@@ -150,6 +162,8 @@ model Attendance {
   isPhotoApproved Boolean   @default(false) // True if AI matches or Admin approves
 
   createdAt       DateTime  @default(now())
+
+  @@index([userId, date])
 }
 
 model ProjectRole {

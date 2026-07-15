@@ -61,11 +61,13 @@ export async function clockInAction(
     }
   }
 
-  const now = new Date();
+  // Current time in IST
+  const nowStr = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+  const nowIST = new Date(nowStr);
+  const now = new Date(); // still keep actual Date for saving to DB
   
-  // Create a date object representing midnight of the local time
-  // Using UTC midnight for simple comparison of the same day
-  const todayStart = new Date();
+  // Midnight in IST
+  const todayStart = new Date(nowIST);
   todayStart.setHours(0, 0, 0, 0);
 
   // Check if already clocked in today
@@ -84,10 +86,10 @@ export async function clockInAction(
 
   // Determine status (LATE if clocked in after 9:15 AM)
   let status = "PRESENT";
-  const lateThreshold = new Date();
+  const lateThreshold = new Date(nowIST);
   lateThreshold.setHours(9, 15, 0, 0);
   
-  if (now > lateThreshold) {
+  if (nowIST > lateThreshold) {
     status = "LATE";
   }
 
