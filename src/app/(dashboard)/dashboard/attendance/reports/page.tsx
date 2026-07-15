@@ -16,11 +16,11 @@ export default async function AttendanceReportPage(props: { searchParams?: Promi
 
   const searchParams = await props.searchParams;
   
-  // Defaults: 1st of current month to today
-  const today = new Date();
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  // Defaults: Today to today
+  const todayStr = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+  const today = new Date(todayStr);
   
-  let startDate = firstDayOfMonth;
+  let startDate = new Date(today);
   let endDate = today;
 
   if (searchParams?.start) {
@@ -102,8 +102,14 @@ export default async function AttendanceReportPage(props: { searchParams?: Promi
     };
   });
 
-  const startStr = startDate.toISOString().split('T')[0];
-  const endStr = endDate.toISOString().split('T')[0];
+  const formatDate = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  const startStr = formatDate(startDate);
+  const endStr = formatDate(endDate);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
