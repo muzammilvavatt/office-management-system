@@ -16,11 +16,12 @@ export default async function AttendanceReportPage(props: { searchParams?: Promi
 
   const searchParams = await props.searchParams;
   
-  // Defaults: Today to today
+  // Defaults: 1st of current month to today
   const todayStr = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
   const today = new Date(todayStr);
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   
-  let startDate = new Date(today);
+  let startDate = firstDayOfMonth;
   let endDate = today;
 
   if (searchParams?.start) {
